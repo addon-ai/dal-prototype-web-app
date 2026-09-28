@@ -5,7 +5,6 @@
 /* Fondo de la app: gradiente con orbes difusos que hacen visible el desenfoque */
 [data-glass='on'] body {
   background: var(--glass-page-bg);
-  background-attachment: fixed;
 }
 
 /* Los contenedores del lienzo dejan ver el fondo */
@@ -18,10 +17,15 @@
 
 /* Superficies con vidrio: barra, paneles, flotantes, tarjetas y chips */
 [data-glass='on'] :is(.topbar, .stage__bar, .recipe, .palette, .inspector, .float, .minimap, .kpi, .panel, .tag, .login__card) {
-  -webkit-backdrop-filter: var(--glass-filter);
-  backdrop-filter: var(--glass-filter);
   background-image: var(--glass-sheen);
   border-color: var(--glass-edge);
+}
+
+/* Rendimiento: el desenfoque real (backdrop-filter) es caro sin GPU. Solo se aplica a pocas
+   superficies pequenas; los paneles grandes usan fondo translucido con brillo, sin desenfoque. */
+[data-glass='on'] :is(.topbar, .float, .minimap, .login__card) {
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
 [data-glass='on'] :is(.topbar, .stage__bar, .recipe) {

@@ -1,12 +1,12 @@
 // Pantalla de inicio de sesion de DEMOSTRACION. No valida, no envia, no guarda ni registra
-// ninguna credencial: cualquier entrada (incluso vacia) lleva siempre al constructor.
+// ninguna credencial: cualquier entrada (incluso vacia) lleva siempre a la coleccion de agentes.
 const LEAVE_MS = 400;
 
 function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-export function mountLogin({ login, shell, form, logoutButton, store }) {
+export function mountLogin({ login, shell, form, logoutButton, store, onEnter, onLeave }) {
   let leaveTimer = null;
 
   function announce(text) {
@@ -16,6 +16,7 @@ export function mountLogin({ login, shell, form, logoutButton, store }) {
   function finishLeave() {
     clearTimeout(leaveTimer);
     login.hidden = true;
+    login.inert = true; // oculto: nada del acceso puede recibir eventos
     login.classList.remove('login--leaving');
   }
 
@@ -24,9 +25,8 @@ export function mountLogin({ login, shell, form, logoutButton, store }) {
     form.reset();
     shell.inert = false;
     store.dispatch({ type: 'SIM_STOP', silent: true });
-    store.dispatch({ type: 'SET_VIEW', view: 'constructor' });
-    document.getElementById('constructor-title').focus({ preventScroll: true });
-    announce('Sesión de demostración iniciada. Estás en el Constructor.');
+    onEnter();
+    announce('Sesión de demostración iniciada. Estás en Agentes.');
     if (prefersReducedMotion()) {
       finishLeave();
       return;
@@ -38,6 +38,8 @@ export function mountLogin({ login, shell, form, logoutButton, store }) {
   function signOut() {
     clearTimeout(leaveTimer);
     shell.inert = true;
+    onLeave();
+    login.inert = false;
     login.hidden = false;
     login.classList.remove('login--leaving');
     form.reset();

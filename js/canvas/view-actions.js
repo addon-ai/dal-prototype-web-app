@@ -9,7 +9,10 @@ import {
   ZOOM,
 } from './viewport.js';
 
-const READABLE_ZOOM = 0.55;
+const READABLE_ZOOM = 0.55; // movil
+const READABLE_ZOOM_WIDE = 0.45; // tablet y escritorio
+const START_PAD = 16;
+const FLOAT_INSET = 56; // ancho de los controles flotantes del lienzo
 
 export function canvasSize(svg) {
   const rect = svg.getBoundingClientRect();
@@ -31,7 +34,7 @@ export function zoomStep(store, svg, direction) {
 
 export function fitToScreen(store, svg) {
   const { width, height } = canvasSize(svg);
-  setViewport(store, fitViewport(store.getState().graph.nodes, width, height));
+  setViewport(store, fitViewport(store.getState().graph.nodes, width, height, FLOAT_INSET));
 }
 
 export function panBy(store, dx, dy) {
@@ -73,16 +76,41 @@ export function centerPosition(store, svg) {
   return { x, y };
 }
 
-// Vista inicial: encuadra todo; en pantallas estrechas prioriza lo legible (inicio del flujo).
-export function initialFit(store, svg) {
-  const { width, height } = canvasSize(svg);
-  const { nodes } = store.getState().graph;
-  const fit = fitViewport(nodes, width, height);
+// Vista inicial: encuadra todo; si eso queda ilegible (pantalla estrecha) muestra el inicio del
+// flujo (primeras dos columnas, sin cortar la primera tarjeta) y "Ajustar" encuadra todo.
+export function initialViewport(nodes, width, height) {
+  const fit = fitViewport(nodes, width, height, FLOAT_INSET);
   const box = nodesBounds(nodes);
-  if (fit.k >= READABLE_ZOOM || !box) {
-    setViewport(store, fit);
-    return;
+  const min = window.matchMedia('(max-width: 767px)').matches ? READABLE_ZOOM : READABLE_ZOOM_WIDE;
+  if (fit.k >= min || !box) {
+    return fit;
   }
-  const y = (height - (box.maxY - box.minY) * READABLE_ZOOM) / 2 - box.minY * READABLE_ZOOM;
-  setViewport(store, { k: READABLE_ZOOM, x: 24 - box.minX * READABLE_ZOOM, y });
+  const xs = [...new Set(nodes.map((node) => node.x))].sort((a, b) => a - b);
+  const span = (xs[1] ?? xs[0]) + NODE_W - box.minX;
+  const k = Math.min(0.75, Math.max(min, (width - START_PAD * 2) / span));
+  const first = nodes.reduce((a, b) => (b.x < a.x ? b : a));
+  const cy = (first.y + NODE_H / 2) * k;
+  return { k, x: START_PAD - box.minX * k, y: Math.max(START_PAD, height * 0.4 - cy) };
+}
+
+// Encuadre inicial y reencuadre automatico mientras el usuario no haya tocado la vista
+// (cambio de tamano del lienzo por paneles, receta o giro del movil).
+export function mountAutoFit(wrap, svg, store) {
+  let last = null;
+  let lastAgent = store.getState().ui.agentId;
+  const apply = () => {
+    const { width, height } = canvasSize(svg);
+    if (width <= 0 || height <= 0) {
+      return;
+    }
+    const current = store.getState().ui.viewport;
+    const { agentId } = store.getState().ui;
+    if (last && current !== last && agentId === lastAgent) {
+      return;
+    }
+    lastAgent = agentId;
+    setViewport(store, initialViewport(store.getState().graph.nodes, width, height));
+    last = store.getState().ui.viewport;
+  };
+  new ResizeObserver(apply).observe(wrap);
 }

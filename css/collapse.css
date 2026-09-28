@@ -69,13 +69,13 @@
   }
 }
 
-@media (min-width: 768px) and (max-width: 1599px) {
+@media (min-width: 768px) and (max-width: 1279px) {
   .view[data-selection='true'][data-inspector='collapsed'] .minimap {
     inset-inline-end: calc(var(--palette-width-collapsed) + var(--space-4));
   }
 }
 
-@media (min-width: 1600px) {
+@media (min-width: 1280px) {
   .view--builder[data-inspector='collapsed'] {
     grid-template-columns: var(--palette-width) minmax(0, 1fr) var(--palette-width-collapsed);
   }

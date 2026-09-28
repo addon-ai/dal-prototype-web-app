@@ -36,7 +36,6 @@
   height: 46vmax;
   border-radius: var(--radius-full);
   pointer-events: none;
-  animation: login-drift 28s ease-in-out infinite alternate;
 }
 
 [data-glass='on'] .login__orb {

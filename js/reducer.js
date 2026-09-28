@@ -5,6 +5,7 @@ import { PRICING } from './pricing.config.js';
 import { computeMetrics } from './domain/metrics.js';
 import { computeInvoice } from './domain/costs.js';
 import { formatCurrency } from './domain/format.js';
+import { AGENT_HANDLERS } from './reducer-agents.js';
 import { UI_HANDLERS, IDLE_SIM, INITIAL_VIEWPORT, withNotice } from './reducer-ui.js';
 
 export const GRID = { stepX: 236, stepY: 130, startX: 40, startY: 40, columns: 4 };
@@ -18,7 +19,8 @@ export function createInitialState(graph = cloneTemplateGraph()) {
     ui: {
       selectedId: null,
       connectFrom: null,
-      view: 'constructor',
+      view: 'agentes',
+      agentId: null,
       notice: null,
       noticeSeq: 0,
       viewport: INITIAL_VIEWPORT,
@@ -201,6 +203,7 @@ const HANDLERS = {
   SET_VOLUME: (state, { casosMes }) => ({ ...state, scenario: { ...state.scenario, casosMes } }),
   SET_VIEW: (state, { view }) => ({ ...state, ui: { ...state.ui, view } }),
   ...UI_HANDLERS,
+  ...AGENT_HANDLERS,
 };
 
 export function reducer(state, action) {

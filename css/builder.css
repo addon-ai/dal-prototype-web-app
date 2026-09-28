@@ -422,7 +422,7 @@
   }
 }
 
-@media (min-width: 1600px) {
+@media (min-width: 1280px) {
   .inspector {
     position: static;
     grid-column: 3;
@@ -437,7 +437,7 @@
 
 }
 
-@media (min-width: 1600px) {
+@media (min-width: 1280px) {
   .view[data-selection='true'] .minimap {
     inset-inline-end: var(--space-4);
   }

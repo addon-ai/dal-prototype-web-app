@@ -1,0 +1,94 @@
+// Coleccion de agentes: saludo, filtros con conteos, busqueda, orden y cuadricula de tarjetas.
+import { h } from './dom.js';
+import { agentCard, newAgentCard } from './agents-card.js';
+import { listAgents, createAgent, ME } from '../data/agents/index.js';
+
+const FILTERS = [
+  ['todos', 'Todos', () => true],
+  ['mios', 'Míos', (agent) => agent.owner === ME],
+  ['org', 'De mi organización', (agent) => agent.scope === 'organizacion'],
+];
+const SORTS = [
+  ['recientes', 'Más recientes', (a, b) => a.edited - b.edited],
+  ['nombre', 'Nombre (A a Z)', (a, b) => a.name.localeCompare(b.name, 'es')],
+];
+const normalize = (text) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+
+export function mountAgents(view, store, openAgent) {
+  const root = view.querySelector('#agents-root');
+  const state = { filter: 'todos', query: '', sort: 'recientes' };
+
+  const intro = h('p', 'agents__intro', 'Hola, Camila. Estos son los agentes de Transportes Andina S.A.S. (ejemplo).');
+  const tag = h('p', 'tag', 'Datos de ejemplo');
+  const bar = h('div', 'agents__bar');
+  const filters = h('div', 'agents__filters');
+  filters.setAttribute('role', 'group');
+  filters.setAttribute('aria-label', 'Filtrar agentes');
+  const search = document.createElement('input');
+  search.type = 'search';
+  search.id = 'agents-search';
+  search.className = 'select agents__search';
+  search.placeholder = 'Buscar un agente…';
+  search.setAttribute('aria-label', 'Buscar un agente');
+  const sortSelect = document.createElement('select');
+  sortSelect.className = 'select';
+  sortSelect.setAttribute('aria-label', 'Ordenar agentes');
+  SORTS.forEach(([value, label]) => {
+    const option = h('option', '', label);
+    option.value = value;
+    sortSelect.append(option);
+  });
+  const status = h('p', 'agents__status');
+  status.setAttribute('role', 'status');
+  const grid = h('ul', 'agents__grid');
+  bar.append(filters, search, sortSelect);
+  root.append(intro, tag, bar, status, grid);
+
+  function paintFilters() {
+    filters.replaceChildren();
+    FILTERS.forEach(([id, label, test]) => {
+      const count = listAgents().filter(test).length;
+      const button = h('button', 'btn agents__filter', `${label} (${count})`);
+      button.type = 'button';
+      button.setAttribute('aria-pressed', String(state.filter === id));
+      button.addEventListener('click', () => {
+        state.filter = id;
+        paint();
+      });
+      filters.append(button);
+    });
+  }
+
+  function paint() {
+    const test = FILTERS.find(([id]) => id === state.filter)[2];
+    const order = SORTS.find(([id]) => id === state.sort)[2];
+    const q = normalize(state.query.trim());
+    const shown = listAgents()
+      .filter(test)
+      .filter((a) => !q || normalize(`${a.name} ${a.description}`).includes(q))
+      .sort(order);
+    paintFilters();
+    grid.replaceChildren(...shown.map((agent, i) => agentCard(agent, i, openAgent)));
+    if (state.filter !== 'org') {
+      grid.append(newAgentCard(onCreate));
+    }
+    status.textContent = shown.length
+      ? `${shown.length} ${shown.length === 1 ? 'agente' : 'agentes'}`
+      : 'No hay agentes con este filtro o búsqueda. Cambia el filtro o crea uno nuevo.';
+  }
+
+  function onCreate(fromTemplate) {
+    openAgent(createAgent(fromTemplate).id);
+  }
+
+  search.addEventListener('input', () => {
+    state.query = search.value;
+    paint();
+  });
+  sortSelect.addEventListener('change', () => {
+    state.sort = sortSelect.value;
+    paint();
+  });
+  store.subscribe((s) => s.ui.view, (v) => v === 'agentes' && paint());
+  paint();
+}

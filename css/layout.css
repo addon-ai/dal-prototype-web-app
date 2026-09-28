@@ -1,6 +1,7 @@
 /* App shell a pantalla completa (100vw x 100dvh). Mobile-first.
    Breakpoints: 768px (tablet: paleta + lienzo, inspector lateral flotante),
-   1600px (escritorio ancho: inspector siempre visible como tercera columna). Solo tokens. */
+   1280px (escritorio: inspector siempre visible como tercera columna que reserva su ancho),
+   1600px (titulo + rotulo + pista en una fila). Solo tokens. */
 
 body {
   display: grid;
@@ -246,6 +247,7 @@ body[data-view='constructor'] .app-main {
 }
 
 .stage__scenario {
+  display: block; /* con inline-flex el texto no admite puntos suspensivos */
   order: 2;
   margin-inline-start: 0;
   flex: 1 1 8rem;
@@ -338,7 +340,9 @@ body[data-view='constructor'] .app-main {
   .stage__hint {
     display: block;
   }
+}
 
+@media (min-width: 1280px) {
   .view--builder {
     grid-template-columns: var(--palette-width) minmax(0, 1fr) var(--inspector-width);
   }

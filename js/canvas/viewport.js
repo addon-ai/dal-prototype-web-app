@@ -29,18 +29,24 @@ export function nodesBounds(nodes) {
   };
 }
 
+// Margen proporcional al lienzo: holgado pero sin desperdiciar espacio.
+export function fitPad(width, height) {
+  return Math.round(Math.max(16, Math.min(32, Math.min(width, height) * 0.035)));
+}
+
 // Viewport que encuadra todos los pasos con margen; sin pasos, vista neutra.
-export function fitViewport(nodes, width, height, pad = 40) {
+// `inset` reserva un borde izquierdo (controles flotantes) para que no tapen el primer paso.
+export function fitViewport(nodes, width, height, inset = 0, pad = fitPad(width, height)) {
   const box = nodesBounds(nodes);
   if (!box || width <= 0 || height <= 0) {
     return { x: 0, y: 0, k: 1 };
   }
   const w = box.maxX - box.minX;
   const h = box.maxY - box.minY;
-  const k = clampZoom(Math.min(1.25, (width - pad * 2) / w, (height - pad * 2) / h));
+  const k = clampZoom(Math.min(1.25, (width - inset - pad * 2) / w, (height - pad * 2) / h));
   return {
     k,
-    x: (width - w * k) / 2 - box.minX * k,
+    x: inset + (width - inset - w * k) / 2 - box.minX * k,
     y: (height - h * k) / 2 - box.minY * k,
   };
 }

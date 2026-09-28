@@ -8,7 +8,8 @@ import { CATALOG } from './data/catalog.js';
 import { PRICING } from './pricing.config.js';
 import { computeMetrics } from './domain/metrics.js';
 import { computeInvoice } from './domain/costs.js';
-import { getDraft, setDraft, clearDraft } from './draft-storage.js';
+import { cloneAgentGraph } from './data/agents/index.js';
+import { setDraft, clearDraft } from './draft-storage.js';
 import { mountCanvas } from './canvas/render.js';
 import { attachNodeDrag } from './canvas/node-drag.js';
 import { attachPanZoom } from './canvas/pan-zoom.js';
@@ -17,7 +18,7 @@ import { attachKeyboard } from './canvas/keyboard.js';
 import { mountControls } from './canvas/controls.js';
 import { mountMinimap } from './canvas/minimap.js';
 import { mountSimulation } from './canvas/simulate.js';
-import { fitToScreen, initialFit } from './canvas/view-actions.js';
+import { fitToScreen, mountAutoFit } from './canvas/view-actions.js';
 import { mountPalette } from './ui/palette.js';
 import { mountInspector } from './ui/inspector.js';
 import { mountInspectorToggle } from './ui/inspector-toggle.js';
@@ -25,29 +26,17 @@ import { mountLive } from './ui/live.js';
 import { mountRecipe } from './ui/recipe.js';
 import { mountStats } from './ui/stats.js';
 import { mountCosts } from './ui/costs.js';
-import { mountNarrative } from './ui/narrative.js';
+import { mountAgents } from './ui/agents.js';
+import { mountAccount } from './ui/account.js';
+import { mountBuilderHead } from './ui/builder-head.js';
+import { mountViews } from './views.js';
+import { mountHashSync, goTo, parseHash, clearHash } from './navigation.js';
 
 const DRAFT_DELAY_MS = 500;
-const VIEWS = ['constructor', 'resultados', 'narrativa'];
+const EMPTY_GRAPH = { id: 'sin-agente', name: '', version: '1.0.0', nodes: [], edges: [] };
 
-function isValidDraft(graph) {
-  if (!graph || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
-    return false;
-  }
-  const ids = new Set(graph.nodes.map((node) => node.id));
-  return (
-    graph.nodes.every(
-      (node) => CATALOG.some((entry) => entry.step === node.step) && node.settings,
-    ) && graph.edges.every((edge) => ids.has(edge.from) && ids.has(edge.to))
-  );
-}
-
-function loadInitialState() {
-  const draft = getDraft();
-  return isValidDraft(draft) ? createInitialState(draft) : createInitialState();
-}
-
-const store = createStore(reducer, loadInitialState());
+// Sin agente abierto el grafo esta vacio; al abrir uno se carga su grafo (o su borrador).
+const store = createStore(reducer, createInitialState(EMPTY_GRAPH));
 
 // Calculo compartido por Estadisticas y Costos: se recalcula solo si cambia el grafo o el volumen.
 let cache = { graph: null, scenario: null, model: null };
@@ -81,18 +70,14 @@ mountPalette({
   store,
 });
 
-// Encuadre inicial: en cuanto el lienzo tiene tamano (tambien si nace oculto).
-let fitted = false;
-new ResizeObserver(() => {
-  if (!fitted && wrap.clientWidth > 0 && wrap.clientHeight > 0) {
-    fitted = true;
-    initialFit(store, svg);
-  }
-}).observe(wrap);
+// Encuadre inicial y reencuadre mientras el usuario no toque la vista.
+mountAutoFit(wrap, svg, store);
 
+// "Restaurar plantilla" devuelve el grafo original del agente abierto.
 function restoreTemplate() {
-  clearDraft();
-  store.dispatch({ type: 'LOAD_TEMPLATE' });
+  const { agentId } = store.getState().ui;
+  clearDraft(agentId);
+  store.dispatch({ type: 'LOAD_TEMPLATE', graph: cloneAgentGraph(agentId) });
   fitToScreen(store, svg);
 }
 mountInspector(document.getElementById('inspector-panel'), store);
@@ -106,54 +91,53 @@ mountLive(document.getElementById('live'), store);
 mountRecipe(document.getElementById('recipe'), document.getElementById('recipe-body'), store);
 mountStats(document.getElementById('stats'), store, getModel);
 mountCosts(document.getElementById('costs'), store, getModel);
-mountNarrative(document.getElementById('narrative'), store);
 
-// Vistas: una visible a la vez; al navegar el foco pasa al encabezado principal.
-const navButtons = Array.from(document.querySelectorAll('[data-view]'));
-function showView(view, moveFocus) {
-  document.body.dataset.view = view;
-  VIEWS.forEach((name) => {
-    document.getElementById(`view-${name}`).hidden = name !== view;
-  });
-  navButtons.forEach((button) => {
-    if (button.dataset.view === view) {
-      button.setAttribute('aria-current', 'page');
-    } else {
-      button.removeAttribute('aria-current');
-    }
-  });
-  if (moveFocus) {
-    document.getElementById('main').scrollTo(0, 0);
-    document.querySelector(`#view-${view} h1`).focus();
-  }
-}
-navButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    store.dispatch({ type: 'SET_VIEW', view: button.dataset.view });
-  });
-});
-store.subscribe(
-  (state) => state.ui.view,
-  (view) => showView(view, true),
+// Vistas, navegacion por hash, coleccion de agentes y cabecera del constructor.
+const session = { active: false };
+const views = mountViews(store);
+const syncHash = mountHashSync(store, () => session.active);
+mountBuilderHead(store, document.getElementById('view-constructor'));
+mountAgents(document.getElementById('view-agentes'), store, (id) =>
+  goTo(store, { view: 'constructor', id }),
 );
-showView(store.getState().ui.view, false);
+mountAccount();
 
-// Borrador: se guarda 500 ms despues del ultimo cambio; si no hay localStorage, se ignora.
+// Borrador por agente: se guarda 500 ms despues del ultimo cambio; sin localStorage, se ignora.
 let draftTimer = null;
+let draftAgent = null;
 store.subscribe(
   (state) => state.graph,
-  (graph) => {
+  (graph, state) => {
     clearTimeout(draftTimer);
-    draftTimer = setTimeout(() => setDraft(graph), DRAFT_DELAY_MS);
+    if (state.ui.agentId !== draftAgent) {
+      draftAgent = state.ui.agentId; // grafo recien cargado: no es una edicion del usuario
+      return;
+    }
+    const { agentId } = state.ui;
+    draftTimer = setTimeout(() => setDraft(agentId, graph), DRAFT_DELAY_MS);
   },
 );
 
 // Efecto cristal y sesion de demostracion (el login se muestra en cada carga).
 initGlassToggle(document.getElementById('glass-toggle'));
+const requested = parseHash(window.location.hash);
 mountLogin({
   login: document.getElementById('login'),
   shell: document.getElementById('app-shell'),
   form: document.getElementById('login-form'),
   logoutButton: document.getElementById('logout'),
   store,
+  onEnter: () => {
+    session.active = true;
+    goTo(store, requested);
+    syncHash();
+    views.focusHeading();
+  },
+  onLeave: () => {
+    session.active = false;
+    requested.view = 'agentes';
+    requested.id = '';
+    clearHash();
+    store.dispatch({ type: 'SET_VIEW', view: 'agentes' });
+  },
 });

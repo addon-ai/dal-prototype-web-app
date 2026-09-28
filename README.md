@@ -20,14 +20,24 @@ forma determinista a partir del grafo. No representan precios reales ni resultad
 La app ocupa 100vw x 100dvh: barra superior compacta, paleta lateral colapsable (con busqueda y
 acordeon por categoria), lienzo central con zoom/paneo (rueda, arrastrar el fondo, botones, teclas
 `+`, `-`, `0`), minimapa, controles flotantes y "Probar recorrido" (simulacion con datos mock).
-El inspector es una tercera columna desde 1600 px, un panel lateral flotante entre 768 y 1599 px y
+El inspector es una tercera columna desde 1280 px (reserva su ancho en la rejilla), un panel
+lateral flotante entre 768 y 1279 px y
 una hoja inferior en movil. El zoom/paneo y la simulacion viven en `ui` del store y no forman parte
 de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (ver su cabecera).
+
+## Agentes, cuenta y rutas
+
+- **Agentes** (`#/agentes`): colección mock de 7 agentes de logística (`js/data/agents/`), con filtros
+  Todos/Míos/De mi organización, búsqueda, orden y tarjeta "Nuevo agente". Cada agente tiene su grafo,
+  receta, resultados y costos; el borrador se guarda por agente (`dal-proto-draft-v2:<id>`).
+- **Rutas por hash**: `#/agentes`, `#/constructor/:id`, `#/resultados/:id` (solo hash, sin red).
+- **Cuenta**: el avatar de la barra abre un panel con usuario y empresa de ejemplo, tema, cristal y
+  "Cerrar sesión".
 
 ## Acceso de demostración y efecto cristal
 
 - **Inicio de sesión (mock)**: en cada carga se muestra primero una pantalla de acceso. "Iniciar sesión"
-  (o Enter) entra SIEMPRE al Constructor, sin validar nada y aceptando campos vacíos. No se envía, guarda
+  (o Enter) entra a la colección de Agentes (o al destino pedido por hash, si es válido), sin validar nada y aceptando campos vacíos. No se envía, guarda
   ni registra ninguna credencial (los campos se vacían al enviar). "Cerrar sesión" (barra superior) vuelve
   al acceso. Mientras está visible, el resto de la app queda `inert`.
 - **Efecto cristal (Liquid Glass)**: activado por defecto; el botón de la barra superior lo alterna
@@ -88,3 +98,24 @@ debe cargar sin errores y exponer sus funciones exportadas.
 - [ ] Network: solo se solicitan las fuentes de Google Fonts, ninguna otra petición externa.
 - [ ] Fuentes bloqueadas: con Google Fonts bloqueado, la página usa fallbacks y sigue siendo usable.
 - [ ] Cifras idénticas entre dos cargas (determinismo).
+
+## Narrativa de validación (retirada de la app; borrador)
+
+La pestaña "Narrativa" se quitó de la app; su contenido se conserva aquí. Estado: borrador, confirmar en
+sesión 2. Las variables X, Y y Z están "por definir" (sin cifras).
+
+- **Problema**: las consultas de estado de envío y los reclamos saturan a atención al cliente; las respuestas
+  son lentas y los criterios de compensación son inconsistentes.
+- **Solución**: el asistente entiende la consulta, revisa el sistema de transporte y las políticas, aplica la
+  regla de retraso y pide la aprobación del supervisor solo si hay compensación.
+- **Usuario y decisor**: usuario, agente de servicio al cliente y supervisor; decisor, gerente de operaciones
+  o de servicio al cliente.
+- **Resultado esperado**: menor tiempo de respuesta y más casos resueltos sin intervención humana, con el
+  costo por caso a la vista.
+- **Hipótesis**: si el asistente resuelve al menos {X}% de las consultas de estado en menos de {Y} minutos,
+  el equipo reduce {Z} horas por semana con un costo por caso menor que el actual. X: porcentaje de consultas
+  resueltas; Y: minutos de respuesta; Z: horas por semana que se reducen (todas por definir).
+- **Pendientes**: cómo funciona hoy el proceso; quién participa; qué indicador mejora.
+
+La spec `openspec/changes/dal-prototype-gerencial/specs/prototype-validation-narrative/` describe la vista
+que existió; queda como histórico.
