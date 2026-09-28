@@ -9,7 +9,7 @@
 }
 
 html {
-  font-size: var(--font-size-base);
+  font-size: 100%;
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -17,6 +17,7 @@ html {
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   font-family: var(--font-primary);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
@@ -103,10 +104,11 @@ summary,
   min-width: var(--tap-min);
 }
 
-/* Foco reforzado (>= 2px, >= 3:1); el anillo verde de 10 % del repo era casi invisible */
+/* Foco reforzado (>= 2px, >= 3:1); el anillo verde de 10 % de la app era casi invisible */
 :focus-visible {
   outline: var(--focus-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-offset);
+  box-shadow: var(--shadow-focus);
 }
 
 :focus:not(:focus-visible) {
@@ -129,13 +131,34 @@ summary,
   background: var(--color-bg-card);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
   transition:
     background-color var(--transition-fast),
-    border-color var(--transition-fast);
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .btn:hover {
   background: var(--color-bg-raised);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--icon {
+  padding: var(--space-2);
+}
+
+.btn--ghost {
+  border-color: transparent;
+  background: transparent;
 }
 
 .btn--primary {
@@ -146,6 +169,7 @@ summary,
 
 .btn--primary:hover {
   background: var(--color-btn-primary-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .icon {

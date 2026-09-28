@@ -1,5 +1,8 @@
 // Alternativa de teclado a todo el arrastre: flechas mueven, C conecta, Enter selecciona
-// o conecta con el paso de destino, Supr elimina, Escape cancela. Los anuncios salen del store.
+// o conecta con el paso de destino, Supr elimina, Escape cancela. Mas/menos hacen zoom y 0
+// encuadra todo. Con el lienzo enfocado, las flechas lo desplazan. Los anuncios salen del store.
+import { zoomStep, fitToScreen, panBy, revealById } from './view-actions.js';
+
 const STEP = 16;
 const STEP_BIG = 64;
 
@@ -40,8 +43,38 @@ function activateNode(store, id) {
   }
 }
 
+const PAN_STEP = 48;
+
+function viewKey(svg, store, event) {
+  if (event.key === '+' || event.key === '=') {
+    zoomStep(store, svg, 1);
+  } else if (event.key === '-' || event.key === '_') {
+    zoomStep(store, svg, -1);
+  } else if (event.key === '0') {
+    fitToScreen(store, svg);
+  } else if (event.target === svg && event.key in ARROWS) {
+    const [ux, uy] = ARROWS[event.key];
+    panBy(store, -ux * PAN_STEP, -uy * PAN_STEP);
+  } else {
+    return false;
+  }
+  event.preventDefault();
+  return true;
+}
+
 export function attachKeyboard(svg, store) {
+  // Al enfocar un paso con Tab, se desplaza el lienzo lo justo para verlo completo.
+  svg.addEventListener('focusin', (event) => {
+    const holder = event.target.closest('.node');
+    if (holder) {
+      revealById(store, svg, holder.dataset.id);
+    }
+  });
+
   svg.addEventListener('keydown', (event) => {
+    if (!event.ctrlKey && !event.metaKey && !event.altKey && viewKey(svg, store, event)) {
+      return;
+    }
     const holder = event.target.closest('.node, .edge');
     if (event.key === 'Escape' && store.getState().ui.connectFrom) {
       event.preventDefault();

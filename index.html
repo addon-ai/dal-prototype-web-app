@@ -33,12 +33,14 @@
     <link rel="stylesheet" href="./css/base.css" />
     <link rel="stylesheet" href="./css/layout.css" />
     <link rel="stylesheet" href="./css/canvas.css" />
+    <link rel="stylesheet" href="./css/builder.css" />
+    <link rel="stylesheet" href="./css/palette.css" />
     <link rel="stylesheet" href="./css/panels.css" />
   </head>
   <body>
     <a class="skip-link" href="#main">Saltar al contenido</a>
 
-    <header class="app-header">
+    <header class="topbar">
       <div class="brand">
         <img
           class="brand__logo brand__logo--light"
@@ -50,6 +52,7 @@
           src="./assets/logo-sidebar-dark.svg"
           alt="DAL Platform"
         />
+        <img class="brand__icon" src="./assets/favicon.svg" alt="DAL Platform" />
       </div>
 
       <nav class="main-nav" aria-label="Secciones">
@@ -68,10 +71,12 @@
         </ul>
       </nav>
 
+      <p class="tag tag--example topbar__tag">Datos de ejemplo</p>
+
       <button
         type="button"
         id="theme-toggle"
-        class="btn theme-toggle"
+        class="btn btn--icon theme-toggle"
         aria-pressed="false"
         aria-label="Cambiar a modo oscuro"
       >
@@ -96,55 +101,62 @@
         aria-atomic="true"
       ></div>
 
-      <section id="view-constructor" class="view" aria-labelledby="constructor-title">
-        <div class="view__head">
-          <h1 id="constructor-title" tabindex="-1">Asistente de seguimiento de envíos</h1>
-          <p>
-            Atención de consultas y reclamos de clientes. Arrastra pasos, conéctalos y ajusta el
-            asistente.
-          </p>
-          <p class="tag" id="scenario-tag">Empresa y proceso de ejemplo: a definir en sesión 2</p>
-          <div>
-            <button type="button" id="restore-template" class="btn">Restaurar plantilla</button>
-          </div>
-        </div>
+      <section
+        id="view-constructor"
+        class="view view--builder"
+        aria-labelledby="constructor-title"
+        data-selection="false"
+        data-palette="expanded"
+      >
+        <aside id="palette" class="palette" aria-label="Pasos disponibles" data-open="false">
+          <button
+            type="button"
+            id="palette-toggle"
+            class="btn btn--primary palette__toggle"
+            aria-expanded="false"
+            aria-controls="palette-panel"
+          >
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Agregar un paso
+          </button>
+          <div id="palette-panel" class="palette__panel"></div>
+        </aside>
 
-        <div class="builder">
-          <aside id="palette" class="palette" aria-label="Pasos disponibles">
-            <button
-              type="button"
-              id="palette-toggle"
-              class="btn btn--primary palette__toggle"
-              aria-expanded="false"
-              aria-controls="palette-list"
-            >
-              Agregar un paso
-            </button>
-            <ul id="palette-list" class="palette__list"></ul>
-          </aside>
+        <div class="stage">
+          <div class="stage__bar">
+            <div class="stage__title">
+              <h1 id="constructor-title" tabindex="-1">Asistente de seguimiento de envíos</h1>
+              <p class="tag stage__scenario" id="scenario-tag">
+                Empresa y proceso de ejemplo: a definir en sesión 2
+              </p>
+              <p class="stage__hint">
+                Atención de consultas y reclamos de clientes. Arrastra pasos, conéctalos y ajusta
+                el asistente.
+              </p>
+            </div>
+            <div id="stage-actions" class="stage__actions"></div>
+          </div>
 
           <div id="canvas-wrap" class="canvas-wrap"></div>
 
-          <aside
-            id="inspector"
-            class="panel builder__inspector"
-            aria-label="Ajustes del paso"
-          ></aside>
+          <details id="recipe" class="recipe">
+            <summary>Receta técnica (para TI)</summary>
+            <div id="recipe-body" class="recipe__body"></div>
+          </details>
         </div>
 
-        <details id="recipe" class="recipe">
-          <summary>Receta técnica (para TI)</summary>
-          <div id="recipe-body" class="recipe__body"></div>
-        </details>
+        <aside id="inspector" class="inspector" aria-label="Ajustes del paso"></aside>
       </section>
 
-      <section id="view-resultados" class="view" aria-labelledby="resultados-title" hidden>
+      <section id="view-resultados" class="view view--page" aria-labelledby="resultados-title" hidden>
         <h1 id="resultados-title" tabindex="-1">Resultados y costos</h1>
         <div id="stats"></div>
         <div id="costs"></div>
       </section>
 
-      <section id="view-narrativa" class="view" aria-labelledby="narrativa-title" hidden>
+      <section id="view-narrativa" class="view view--page" aria-labelledby="narrativa-title" hidden>
         <div id="narrative"></div>
       </section>
     </main>

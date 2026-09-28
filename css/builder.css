@@ -1,0 +1,442 @@
+/* Cromo del constructor: lienzo, controles flotantes, minimapa, estado vacio, inspector. */
+
+.canvas-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--canvas-bg);
+  transition: box-shadow var(--transition-fast);
+}
+
+.canvas-wrap--drop {
+  box-shadow: inset 0 0 0 var(--stroke-bold) var(--color-focus-ring);
+}
+
+.canvas-wrap--drop::after {
+  content: 'Suelta aquí para agregar el paso';
+  position: absolute;
+  inset-block-start: var(--space-3);
+  inset-inline: 0;
+  width: fit-content;
+  margin-inline: auto;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-tooltip);
+  color: var(--color-text-on-dark);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  pointer-events: none;
+}
+
+/* Chips de icono por categoria (icono + color + forma del contenedor) */
+.chip {
+  --cat: var(--color-cat-ai);
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: var(--cat);
+  color: var(--color-on-cat);
+}
+
+.chip--data {
+  --cat: var(--color-cat-data);
+  border-radius: var(--radius-full);
+}
+
+.chip--control {
+  --cat: var(--color-cat-control);
+  border-radius: var(--radius-sm);
+}
+
+.chip--person {
+  --cat: var(--color-cat-person);
+  border-radius: var(--radius-full);
+}
+
+.chip--edge {
+  --cat: var(--color-text-secondary);
+}
+
+.chip--lg {
+  width: var(--space-10);
+  height: var(--space-10);
+}
+
+/* Controles flotantes (estilo panel de zoom de editores de flujos) */
+.float {
+  position: absolute;
+  inset-block-end: var(--space-4);
+  inset-inline-start: var(--space-4);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  border: var(--border-width) solid var(--float-border);
+  border-radius: var(--radius-xl);
+  background: var(--float-bg);
+  box-shadow: var(--float-shadow);
+}
+
+.float__btn {
+  width: var(--tap-min);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.float__btn:hover {
+  background: var(--color-bg-raised);
+}
+
+.float__btn + .float__btn {
+  border-block-start: var(--border-width) solid var(--color-border-light);
+}
+
+.float__level {
+  padding-block: var(--space-1);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+/* Minimapa */
+.minimap {
+  position: absolute;
+  inset-block-end: var(--space-4);
+  inset-inline-end: var(--space-4);
+  z-index: 5;
+  display: none;
+  width: 200px;
+  height: 128px;
+  overflow: hidden;
+  border: var(--border-width) solid var(--float-border);
+  border-radius: var(--radius-xl);
+  background: var(--float-bg);
+  box-shadow: var(--float-shadow);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.minimap__svg {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.minimap__node {
+  fill: var(--color-cat-ai);
+}
+
+.minimap__node--data {
+  fill: var(--color-cat-data);
+}
+
+.minimap__node--control {
+  fill: var(--color-cat-control);
+}
+
+.minimap__node--person {
+  fill: var(--color-cat-person);
+}
+
+.minimap__mask {
+  fill: var(--minimap-mask);
+}
+
+.minimap__view {
+  fill: none;
+  stroke: var(--color-focus-ring);
+  stroke-width: 6px;
+}
+
+/* Estado vacio */
+.empty {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  text-align: center;
+  pointer-events: none;
+}
+
+.empty > * {
+  pointer-events: auto;
+}
+
+.empty__art {
+  width: 160px;
+  fill: var(--color-accent-soft);
+  stroke: var(--color-border-control);
+  stroke-width: var(--stroke-base);
+  stroke-linecap: round;
+}
+
+.empty__title {
+  font-size: var(--font-size-xl);
+}
+
+.empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+/* Paso fantasma mientras se arrastra desde la paleta */
+.ghost {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+  border: var(--border-width) solid var(--node-border-hover);
+  border-radius: var(--radius-xl);
+  background: var(--node-bg);
+  box-shadow: var(--shadow-xl);
+  color: var(--node-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  opacity: var(--node-ghost-opacity);
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(-2deg);
+}
+
+.ghost__chip {
+  display: grid;
+  place-items: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: var(--radius-md);
+  background: var(--node-ai);
+  color: var(--node-on-cat);
+}
+
+.ghost--data .ghost__chip {
+  background: var(--node-data);
+}
+
+.ghost--control .ghost__chip {
+  background: var(--node-control);
+}
+
+.ghost--person .ghost__chip {
+  background: var(--node-person);
+}
+
+/* Recorrido de prueba (barra superior del lienzo) */
+.sim__btn {
+  gap: var(--space-2);
+}
+
+.sim__progress:empty {
+  display: none;
+}
+
+.sim__progress {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Inspector: columna derecha (laptop), panel lateral (tablet) u hoja inferior (movil) */
+.inspector {
+  z-index: 40;
+  overflow-y: auto;
+  background: var(--panel-bg);
+  border-block-start: var(--border-width) solid var(--panel-border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: var(--shadow-xl);
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  max-height: var(--sheet-max-height);
+  transform: translateY(105%);
+  transition: transform var(--transition-panel);
+  visibility: hidden;
+}
+
+.view[data-selection='true'] .inspector {
+  transform: none;
+  visibility: visible;
+}
+
+.inspector__head {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-block-end: var(--border-width) solid var(--color-border-light);
+  background: var(--panel-bg);
+}
+
+.inspector__titles {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.inspector__title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--font-size-md);
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.inspector__type {
+  overflow: hidden;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inspector__head-actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.inspector__body {
+  padding: var(--space-4);
+}
+
+.inspector__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.inspector__empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.inspector__empty-title {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+}
+
+.inspector__art {
+  width: 96px;
+  fill: var(--color-accent-soft);
+  stroke: var(--color-border-control);
+  stroke-width: var(--stroke-base);
+  stroke-linecap: round;
+}
+
+.inspector__tips {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  text-align: start;
+  list-style: disc;
+  padding-inline-start: var(--space-4);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+  margin-block-end: var(--space-4);
+}
+
+.field__label {
+  color: var(--font-label-color, var(--color-text-primary));
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.field__scale {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.field input:not([type='range']),
+.field select,
+.select {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border-control);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  transition: border-color var(--transition-fast);
+}
+
+.field input[type='range'] {
+  width: 100%;
+  min-height: var(--tap-min);
+  accent-color: var(--color-btn-primary-bg);
+}
+
+.btn--danger {
+  border-color: var(--color-status-crit);
+  color: var(--color-status-crit);
+}
+
+.btn--danger:hover {
+  background: var(--color-bg-raised);
+}
+
+@media (min-width: 768px) {
+  .minimap {
+    display: block;
+    transition: inset-inline-end var(--transition-panel);
+  }
+
+  .view[data-selection='true'] .minimap {
+    inset-inline-end: calc(var(--inspector-width) + var(--space-4));
+  }
+
+  .inspector {
+    inset-block: 0;
+    inset-inline: auto 0;
+    width: var(--inspector-width);
+    max-height: none;
+    border: 0;
+    border-inline-start: var(--border-width) solid var(--panel-border);
+    border-radius: 0;
+    transform: translateX(105%);
+  }
+}
+
+@media (min-width: 1600px) {
+  .inspector {
+    position: static;
+    grid-column: 3;
+    box-shadow: none;
+    transform: none;
+    visibility: visible;
+  }
+
+  .inspector__close {
+    display: none;
+  }
+
+}
+
+@media (min-width: 1600px) {
+  .view[data-selection='true'] .minimap {
+    inset-inline-end: var(--space-4);
+  }
+}

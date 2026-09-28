@@ -5,10 +5,15 @@
    Capa 2 semantic : significado (fondo, texto, borde); claro por
                      defecto y oscuro via [data-theme='dark'].
    Capa 3 component: nodos, lienzo y foco; solo referencian semantic.
-   Base tipografica 16px (el repo usa 14px; aqui se sube por lectura
-   en pantalla de reunion). Contrastes verificados AA.
+   Reconciliacion con la app real (src/styles/tokens.css):
+   - Escala tipografica y radios: iguales a la app (base 14px, TV >= 1920px x1.14);
+     el minimo es 12px por lectura en pantalla de reunion.
+   - Sombras, easing, transiciones, superficies popover/tooltip y acento: iguales.
+   - Divergencias deliberadas por contraste AA (4.5:1): texto atenuado (blue-500),
+     estados (amber/rojo oscuros en claro), boton primario oscuro (green-700),
+     grafico 1 en teal (claro) y foco solido azul/verde (la app usa un halo de 10 %).
    Breakpoints (var() no es valido en @media, valores canonicos):
-     mobile < 768px | tablet >= 768px | laptop >= 1100px
+     mobile <= 767px | tablet 768-1099px | laptop >= 1100px | tv >= 1920px
    ============================================================ */
 
 /* ── Capa 1: primitive ─────────────────────────────────────── */
@@ -28,6 +33,7 @@
   --p-coral-500: #ef8b72;
   --p-red-700: #c24233;
   --p-purple-600: #7c3aed;
+  --p-violet-400: #a78bfa;
 
   /* Neutros */
   --p-white: #ffffff;
@@ -59,6 +65,19 @@
   --p-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --p-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.08);
   --p-shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --p-shadow-xl: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --p-shadow-xl-dark: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+  --p-hover-card: 0 12px 40px rgba(22, 58, 101, 0.12);
+  --p-hover-card-dark: 0 12px 40px rgba(0, 0, 0, 0.3);
+  --p-node-shadow: drop-shadow(0 1px 2px rgba(22, 58, 101, 0.1))
+    drop-shadow(0 4px 10px rgba(22, 58, 101, 0.08));
+  --p-node-shadow-hover: drop-shadow(0 2px 3px rgba(22, 58, 101, 0.12))
+    drop-shadow(0 10px 18px rgba(22, 58, 101, 0.16));
+  --p-node-shadow-dark: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35))
+    drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+  --p-node-shadow-hover-dark: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4))
+    drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
+  --p-scrim: rgba(15, 23, 42, 0.5);
   --p-shadow-sm-dark: 0 1px 2px rgba(0, 0, 0, 0.2);
   --p-shadow-md-dark: 0 1px 3px rgba(0, 0, 0, 0.25);
   --p-shadow-lg-dark: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
@@ -69,12 +88,16 @@
   --font-primary: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
   --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-base: 16px;
-  --font-size-md: 18px;
-  --font-size-lg: 20px;
-  --font-size-xl: 24px;
-  --font-size-2xl: 32px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+  /* Texto dentro de las tarjetas del lienzo: fijo, escala con el zoom (no con la escala TV) */
+  --font-size-node-title: 15px;
+  --font-size-node-meta: 12px;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -100,6 +123,7 @@
   --radius-lg: 8px;
   --radius-xl: 12px;
   --radius-full: 9999px;
+  --radius-node: 12px;
 
   /* Movimiento */
   --easing-brand: cubic-bezier(0.23, 1, 0.32, 1);
@@ -114,26 +138,30 @@
   --stroke-thin: 1.5px;
   --stroke-base: 2px;
   --stroke-bold: 3px;
-  --header-height: 60px;
-  --logo-height: 32px;
+  --header-height: 52px;
+  --logo-height: 28px;
   --content-max-width: 1400px;
   --content-padding: var(--space-4);
-  --palette-width: 240px;
-  --inspector-width: 300px;
-  --canvas-min-height: 420px;
-  --sheet-max-height: 60vh;
+  --palette-width: 272px;
+  --palette-width-collapsed: 64px;
+  --inspector-width: 304px;
+  --sheet-max-height: 52dvh;
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
+  --transition-slow: 400ms var(--easing-brand);
+  --transition-panel: 250ms var(--easing-out);
 }
 
-/* ── Capa 2: semantic (claro por defecto) ──────────────────── */
+/* ── Capa 2: semantic (claro por defecto) ─────────────────── */
 :root {
   --color-accent: var(--p-green-500);
   --color-accent-hover: var(--p-green-600);
   --color-on-accent: var(--p-blue-900);
-  --color-accent-light: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-accent-light: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 14%, transparent);
 
   --color-text-primary: var(--p-blue-900);
   --color-text-secondary: var(--p-blue-500);
-  /* Repo usa blue-600 (4.3:1 sobre gray-50, no cumple AA); aqui blue-500 */
+  /* La app usa blue-600 (4.3:1 sobre gray-50, no cumple AA); aqui blue-500 */
   --color-text-muted: var(--p-blue-500);
   --color-text-on-dark: var(--p-gray-100);
 
@@ -141,6 +169,9 @@
   --color-bg-card: var(--p-white);
   --color-bg-raised: var(--p-gray-150);
   --color-bg-code: var(--p-gray-100);
+  --color-surface-popover: var(--p-white);
+  --color-surface-tooltip: var(--p-blue-900);
+  --color-scrim: var(--p-scrim);
 
   --color-border: var(--p-gray-300);
   --color-border-light: var(--p-gray-200);
@@ -148,6 +179,7 @@
   --color-border-control: var(--p-blue-600);
 
   --color-focus-ring: var(--p-blue-900);
+  --shadow-focus: 0 0 0 4px color-mix(in srgb, var(--color-accent) 30%, transparent);
 
   --color-btn-primary-bg: var(--p-green-500);
   --color-btn-primary-text: var(--p-blue-900);
@@ -168,11 +200,22 @@
   --color-chart-3: var(--p-purple-600);
   --color-chart-4: var(--p-red-700);
 
+  /* Categorias de paso: color solido (chip) + color del icono sobre el chip */
+  --color-cat-ai: var(--p-green-700);
+  --color-cat-data: var(--p-status-info-light);
+  --color-cat-control: var(--p-status-warn-light);
+  --color-cat-person: var(--p-purple-600);
+  --color-on-cat: var(--p-white);
+
   --color-scrollbar: var(--p-slate-400);
 
   --shadow-sm: var(--p-shadow-sm);
   --shadow-md: var(--p-shadow-md);
   --shadow-lg: var(--p-shadow-lg);
+  --shadow-xl: var(--p-shadow-xl);
+  --hover-card-shadow: var(--p-hover-card);
+  --shadow-node: var(--p-node-shadow);
+  --shadow-node-hover: var(--p-node-shadow-hover);
 }
 
 /* ── Capa 2: semantic (oscuro) ─────────────────────────────── */
@@ -180,6 +223,8 @@
   color-scheme: dark;
 
   --color-on-accent: var(--p-slate-900);
+  --color-accent-light: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 18%, transparent);
 
   --color-text-primary: var(--p-gray-100);
   --color-text-secondary: var(--p-slate-400);
@@ -189,12 +234,15 @@
   --color-bg-card: var(--p-slate-800);
   --color-bg-raised: var(--p-slate-750);
   --color-bg-code: var(--p-slate-900);
+  --color-surface-popover: var(--p-slate-800);
+  --color-surface-tooltip: var(--p-slate-800);
 
   --color-border: var(--p-slate-700);
   --color-border-light: var(--p-slate-800);
   --color-border-control: var(--p-slate-500);
 
   --color-focus-ring: var(--p-green-500);
+  --shadow-focus: 0 0 0 4px color-mix(in srgb, var(--color-accent) 35%, transparent);
 
   --color-btn-primary-bg: var(--p-green-700);
   --color-btn-primary-text: var(--p-white);
@@ -211,38 +259,78 @@
   --color-chart-3: var(--p-status-info-dark);
   --color-chart-4: var(--p-coral-500);
 
+  --color-cat-ai: var(--p-green-500);
+  --color-cat-data: var(--p-status-info-dark);
+  --color-cat-control: var(--p-status-warn-dark);
+  --color-cat-person: var(--p-violet-400);
+  --color-on-cat: var(--p-slate-900);
+
   --color-scrollbar: var(--p-slate-600);
 
   --shadow-sm: var(--p-shadow-sm-dark);
   --shadow-md: var(--p-shadow-md-dark);
   --shadow-lg: var(--p-shadow-lg-dark);
+  --shadow-xl: var(--p-shadow-xl-dark);
+  --hover-card-shadow: var(--p-hover-card-dark);
+  --shadow-node: var(--p-node-shadow-dark);
+  --shadow-node-hover: var(--p-node-shadow-hover-dark);
 }
 
 /* ── Capa 3: component ─────────────────────────────────────── */
 :root {
   /* Lienzo */
-  --canvas-bg: var(--color-bg-card);
-  --canvas-grid: var(--color-chart-grid);
-  --canvas-border: var(--color-border-control);
+  --canvas-bg: var(--color-bg-page);
+  --canvas-dot: var(--color-chart-grid);
+  --canvas-border: var(--color-border);
   --canvas-edge: var(--color-text-secondary);
   --canvas-edge-width: var(--stroke-base);
   --canvas-edge-conditional: var(--color-text-primary);
-  --canvas-edge-conditional-width: var(--stroke-bold);
+  --canvas-edge-conditional-width: var(--stroke-base);
   --canvas-edge-label-bg: var(--color-bg-card);
   --canvas-edge-label-text: var(--color-text-primary);
+  --canvas-edge-active: var(--color-status-ok);
 
-  /* Nodos (forma + icono + texto; el color solo refuerza) */
+  /* Nodos: tarjeta con cabecera por categoria; forma + icono + texto, el color solo refuerza */
   --node-bg: var(--color-bg-card);
-  --node-border: var(--color-border-control);
-  --node-border-width: var(--stroke-base);
+  --node-border: var(--color-border);
+  --node-border-hover: var(--color-border-control);
+  --node-border-width: var(--border-width);
   --node-text: var(--color-text-primary);
-  --node-icon: var(--color-text-primary);
-  --node-selected-border: var(--color-focus-ring);
-  --node-selected-width: var(--stroke-bold);
-  --node-ghost-opacity: 0.6;
-  --node-min-size: var(--tap-min);
-  --node-ai-bg: var(--color-status-ok-bg);
-  --node-data-bg: var(--color-status-info-bg);
-  --node-control-bg: var(--color-status-warn-bg);
-  --node-person-bg: var(--color-accent-light);
+  --node-subtext: var(--color-text-secondary);
+  --node-ring: var(--color-focus-ring);
+  --node-ring-width: var(--stroke-base);
+  --node-ring-focus-width: var(--stroke-bold);
+  --node-ghost-opacity: 0.85;
+  --node-dim-opacity: 0.7;
+  --node-header-mix: 14%;
+  --node-handle-bg: var(--color-bg-card);
+  --node-handle-active: var(--color-accent);
+  --node-badge-bg: var(--color-bg-card);
+  --node-ai: var(--color-cat-ai);
+  --node-data: var(--color-cat-data);
+  --node-control: var(--color-cat-control);
+  --node-person: var(--color-cat-person);
+  --node-on-cat: var(--color-on-cat);
+
+  /* Paneles y controles flotantes */
+  --panel-bg: var(--color-bg-card);
+  --panel-border: var(--color-border);
+  --float-bg: var(--color-surface-popover);
+  --float-border: var(--color-border);
+  --float-shadow: var(--shadow-lg);
+  --minimap-mask: color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+}
+
+/* Escala TV (>= 1920px), igual que la app: sube toda la rampa tipografica */
+@media (min-width: 1920px) {
+  :root {
+    --font-size-xs: 13px;
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    --font-size-md: 17px;
+    --font-size-lg: 18px;
+    --font-size-xl: 23px;
+    --palette-width: 320px;
+    --inspector-width: 360px;
+  }
 }

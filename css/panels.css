@@ -27,20 +27,21 @@
 .tag--illustrative,
 .tag--draft {
   padding: var(--space-1) var(--space-3);
-  border: var(--border-width) solid currentColor;
+  border: var(--border-width) solid var(--tag-accent);
   border-radius: var(--radius-full);
+  color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
 }
 
 .tag--example {
-  color: var(--color-status-info);
+  --tag-accent: var(--color-status-info);
   background: var(--color-status-info-bg);
 }
 
 .tag--illustrative,
 .tag--draft {
-  color: var(--color-status-warn);
+  --tag-accent: var(--color-status-warn);
   background: var(--color-status-warn-bg);
 }
 
@@ -48,14 +49,13 @@
   display: grid;
   gap: var(--space-1);
   max-width: 24rem;
+  margin: 0;
 }
 
-.select {
-  padding: var(--space-2) var(--space-3);
-  border: var(--border-width) solid var(--color-border-control);
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-card);
-  color: var(--color-text-primary);
+#stats,
+#costs {
+  display: grid;
+  gap: var(--space-3);
 }
 
 /* Receta */
@@ -109,22 +109,50 @@
   font-size: var(--font-size-sm);
 }
 
-/* KPIs */
+/* KPIs: rejilla responsiva de tarjetas */
 .kpis {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+  gap: var(--space-4);
 }
 
 .kpi {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--space-2);
   align-content: start;
-  padding: var(--space-3) var(--space-4);
+  min-width: 0;
+  padding: var(--space-4);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-xl);
   background: var(--color-bg-card);
-  min-width: 0;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.kpi:hover {
+  border-color: var(--color-border-control);
+  box-shadow: var(--hover-card-shadow);
+  transform: translateY(-2px);
+}
+
+.kpi__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.kpi__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: var(--color-accent-soft);
+  color: var(--color-text-primary);
 }
 
 .kpi__label,
@@ -133,10 +161,80 @@
   font-size: var(--font-size-sm);
 }
 
+.kpi__label {
+  font-weight: var(--font-weight-medium);
+}
+
 .kpi__value {
-  font-size: var(--font-size-xl);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
   line-height: var(--line-height-tight);
   overflow-wrap: anywhere;
+}
+
+.stats-grid {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.stats-grid .chart__svg {
+  max-width: none;
+}
+
+@media (min-width: 768px) {
+  .kpi__value {
+    font-size: var(--font-size-3xl);
+  }
+}
+
+@media (min-width: 1400px) {
+  .stats-grid {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  }
+
+  .stats-grid .kpis {
+    grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  }
+
+  .stats-grid .kpi__value {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+/* Costos y narrativa: dos columnas en pantallas anchas */
+.cost-grid {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.narrative-grid {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+}
+
+.narrative-grid > .narrative__head,
+.narrative-grid > .narrative__links,
+.narrative-grid > .narrative__card--wide {
+  grid-column: 1 / -1;
+}
+
+.narrative__head {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.narrative__card {
+  border-block-start: var(--stroke-bold) solid var(--color-accent);
+}
+
+@media (min-width: 1100px) {
+  .cost-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
 }
 
 /* Grafico */
@@ -152,7 +250,7 @@
 
 .chart__svg {
   width: 100%;
-  max-width: 30rem;
+  max-width: 68rem;
   height: auto;
 }
 
@@ -163,7 +261,7 @@
 
 .chart__axis {
   fill: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-base);
 }
 
 .chart__bar {

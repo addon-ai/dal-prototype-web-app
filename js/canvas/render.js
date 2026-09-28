@@ -1,81 +1,13 @@
 // Render SVG del lienzo. Los elementos se reutilizan por id (no se recrean al mover),
 // asi el arrastre con Pointer Events y el foco de teclado no se pierden.
 import { getCatalogEntry } from '../data/catalog.js';
-import { NODE_W, NODE_H, shapePath, shapeLayout, svgEl, wrapLabel } from './shapes.js';
+import { svgEl } from './shapes.js';
+import { buildDefs, syncDots } from './defs.js';
+import { buildNode, setNodeText, setNodeBadge } from './node.js';
 import { createEdgeEl, updateEdgeEl } from './edges.js';
 
-const MIN_W = 960;
-const MIN_H = 480;
-const PAD = 80;
-const LINE_H = 16;
-
-function markers() {
-  const defs = svgEl('defs');
-  ['arrow', 'arrow-cond'].forEach((id) => {
-    const marker = svgEl('marker', {
-      id,
-      viewBox: '0 0 10 10',
-      refX: 9,
-      refY: 5,
-      markerWidth: 10,
-      markerHeight: 10,
-      markerUnits: 'userSpaceOnUse',
-      orient: 'auto-start-reverse',
-    });
-    marker.append(svgEl('path', { d: 'M0,0 L10,5 L0,10 z', class: `arrow ${id}` }));
-    defs.append(marker);
-  });
-  const grid = svgEl('pattern', {
-    id: 'grid',
-    width: 32,
-    height: 32,
-    patternUnits: 'userSpaceOnUse',
-  });
-  grid.append(svgEl('path', { d: 'M32,0 H0 V32', class: 'canvas__grid-line' }));
-  defs.append(grid);
-  return defs;
-}
-
-function buildNode(entry) {
-  const layout = shapeLayout(entry.shape);
-  const g = svgEl('g', {
-    class: `node node--${entry.category}`,
-    role: 'button',
-    tabindex: '0',
-    'aria-describedby': 'canvas-help',
-  });
-  const d = shapePath(entry.shape);
-  g.append(svgEl('path', { class: 'node__shape', d }), svgEl('path', { class: 'node__tint', d }));
-  const icon = svgEl('svg', {
-    class: 'node__icon',
-    x: layout.iconX,
-    y: NODE_H / 2 - 12,
-    width: 24,
-    height: 24,
-    viewBox: '0 0 24 24',
-    'aria-hidden': 'true',
-  });
-  icon.innerHTML = entry.icon;
-  g.append(icon, svgEl('text', { class: 'node__text', x: layout.textX }), svgEl('title'));
-  return g;
-}
-
-function setNodeText(g, node, entry) {
-  if (g.dataset.label === node.label) {
-    return;
-  }
-  g.dataset.label = node.label;
-  const text = g.querySelector('.node__text');
-  text.replaceChildren();
-  const lines = wrapLabel(node.label, shapeLayout(entry.shape).chars);
-  const top = NODE_H / 2 - ((lines.length - 1) * LINE_H) / 2;
-  lines.forEach((line, i) => {
-    const tspan = svgEl('tspan', { x: text.getAttribute('x'), y: top + i * LINE_H });
-    tspan.textContent = line;
-    text.append(tspan);
-  });
-  g.querySelector('title').textContent = node.label;
-}
+const HELP =
+  'Enter selecciona. Flechas mueven el paso, con Mayús se mueve más. C inicia una conexión. Supr elimina. Más y menos acercan o alejan; 0 encuadra todo.';
 
 function syncKeyed(layer, map, items, create) {
   const ids = new Set(items.map((item) => item.id));
@@ -94,33 +26,45 @@ function syncKeyed(layer, map, items, create) {
   });
 }
 
+function badgeFor(node, sim, incoming, outgoing) {
+  if (sim.active === node.id) {
+    return ['En curso', 'active'];
+  }
+  if (sim.done.includes(node.id)) {
+    return ['Hecho', 'done'];
+  }
+  if (!incoming.has(node.id)) {
+    return ['Inicio', 'edge'];
+  }
+  return outgoing.has(node.id) ? [null, null] : ['Final', 'edge'];
+}
+
 export function mountCanvas(container, store) {
   const svg = svgEl('svg', { class: 'canvas', role: 'group', tabindex: '-1' });
   svg.setAttribute('aria-label', 'Lienzo del asistente: pasos y conexiones');
   const help = svgEl('desc', { id: 'canvas-help' });
-  help.textContent =
-    'Enter selecciona. Flechas mueven el paso, con Mayús se mueve más. C inicia una conexión. Supr elimina.';
-  const bg = svgEl('rect', {
-    class: 'canvas__bg',
-    width: '100%',
-    height: '100%',
-    fill: 'url(#grid)',
-  });
+  help.textContent = HELP;
+  const bg = svgEl('rect', { class: 'canvas__bg', width: '100%', height: '100%', fill: 'url(#dots)' });
+  const viewport = svgEl('g', { class: 'viewport' });
   const edgeLayer = svgEl('g', { class: 'canvas__edges' });
   const nodeLayer = svgEl('g', { class: 'canvas__nodes' });
-  svg.append(markers(), help, bg, edgeLayer, nodeLayer);
-  container.replaceChildren(svg);
+  const tempLayer = svgEl('g', { class: 'canvas__temp' });
+  viewport.append(edgeLayer, nodeLayer, tempLayer);
+  svg.append(buildDefs(), help, bg, viewport);
+  container.prepend(svg);
 
   const nodeEls = new Map();
   const edgeEls = new Map();
 
   function render(state) {
     const { graph, ui } = state;
+    const { sim } = ui;
     syncKeyed(nodeLayer, nodeEls, graph.nodes, (node) => buildNode(getCatalogEntry(node.step)));
     syncKeyed(edgeLayer, edgeEls, graph.edges, createEdgeEl);
     const byId = new Map(graph.nodes.map((node) => [node.id, node]));
-    let maxX = 0;
-    let maxY = 0;
+    const incoming = new Set(graph.edges.map((edge) => edge.to));
+    const outgoing = new Set(graph.edges.map((edge) => edge.from));
+    svg.classList.toggle('canvas--simulating', sim.status !== 'idle');
     graph.nodes.forEach((node) => {
       const entry = getCatalogEntry(node.step);
       const g = nodeEls.get(node.id);
@@ -130,29 +74,37 @@ export function mountCanvas(container, store) {
       g.setAttribute('aria-pressed', String(ui.selectedId === node.id));
       g.classList.toggle('node--selected', ui.selectedId === node.id);
       g.classList.toggle('node--connect-source', ui.connectFrom === node.id);
-      g.classList.toggle(
-        'node--connect-target',
-        Boolean(ui.connectFrom) && ui.connectFrom !== node.id,
-      );
-      setNodeText(g, node, entry);
-      maxX = Math.max(maxX, node.x + NODE_W);
-      maxY = Math.max(maxY, node.y + NODE_H);
+      g.classList.toggle('node--connect-target', Boolean(ui.connectFrom) && ui.connectFrom !== node.id);
+      g.classList.toggle('node--sim-active', sim.active === node.id);
+      g.classList.toggle('node--sim-done', sim.done.includes(node.id));
+      setNodeText(g, node);
+      const [text, kind] = badgeFor(node, sim, incoming, outgoing);
+      setNodeBadge(g, text, kind);
     });
     graph.edges.forEach((edge) => {
       const from = byId.get(edge.from);
       const to = byId.get(edge.to);
       if (from && to) {
-        updateEdgeEl(edgeEls.get(edge.id), edge, from, to, ui.selectedId === edge.id);
+        updateEdgeEl(edgeEls.get(edge.id), edge, from, to, {
+          selected: ui.selectedId === edge.id,
+          active: sim.activeEdges.includes(edge.id),
+          done: sim.doneEdges.includes(edge.id),
+        });
       }
     });
-    const width = Math.max(MIN_W, maxX + PAD);
-    const height = Math.max(MIN_H, maxY + PAD);
-    svg.setAttribute('width', width);
-    svg.setAttribute('height', height);
-    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  }
+
+  function applyViewport(vp) {
+    viewport.setAttribute('transform', `translate(${vp.x} ${vp.y}) scale(${vp.k})`);
+    syncDots(svg, vp);
   }
 
   render(store.getState());
-  store.subscribe((state) => state, render);
+  applyViewport(store.getState().ui.viewport);
+  store.subscribe((state) => state.graph, (_v, state) => render(state));
+  store.subscribe((state) => state.ui.selectedId, (_v, state) => render(state));
+  store.subscribe((state) => state.ui.connectFrom, (_v, state) => render(state));
+  store.subscribe((state) => state.ui.sim, (_v, state) => render(state));
+  store.subscribe((state) => state.ui.viewport, applyViewport);
   return svg;
 }

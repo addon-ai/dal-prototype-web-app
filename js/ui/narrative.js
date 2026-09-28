@@ -24,7 +24,7 @@ function variablesList(variables) {
 }
 
 function card(element, index) {
-  const section = h('section', 'panel narrative__card');
+  const section = h('section', `panel narrative__card${element.variables ? ' narrative__card--wide' : ''}`);
   section.setAttribute('aria-labelledby', `narr-${element.id}`);
   const title = h('h2', 'narrative__title', `${index + 1}. ${element.titulo}`);
   title.id = `narr-${element.id}`;
@@ -38,7 +38,7 @@ function card(element, index) {
 }
 
 export function mountNarrative(root, store) {
-  const head = h('div', 'view__head');
+  const head = h('div', 'narrative__head');
   const heading = h('h1', '', NARRATIVE.titulo);
   heading.id = 'narrativa-title';
   heading.tabIndex = -1;
@@ -58,5 +58,5 @@ export function mountNarrative(root, store) {
   });
   const cards = NARRATIVE.elementos.map(card);
   root.replaceChildren(head, ...cards, pending, links);
-  root.classList.add('stack');
+  root.classList.add('narrative-grid');
 }

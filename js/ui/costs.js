@@ -104,7 +104,7 @@ export function mountCosts(root, store, getModel) {
     h('h2', '', 'Cuánto costaría'),
     h('p', 'tag tag--illustrative', 'Precios ilustrativos'),
   );
-  const body = h('div', 'stack');
+  const body = h('div', 'cost-grid');
   root.replaceChildren(head, body);
   const paint = () => body.replaceChildren(...buildBody(getModel(store.getState())));
   paint();

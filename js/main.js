@@ -8,8 +8,14 @@ import { computeMetrics } from './domain/metrics.js';
 import { computeInvoice } from './domain/costs.js';
 import { getDraft, setDraft, clearDraft } from './draft-storage.js';
 import { mountCanvas } from './canvas/render.js';
-import { attachNodeDrag } from './canvas/drag.js';
+import { attachNodeDrag } from './canvas/node-drag.js';
+import { attachPanZoom } from './canvas/pan-zoom.js';
+import { attachConnectDrag } from './canvas/connect-drag.js';
 import { attachKeyboard } from './canvas/keyboard.js';
+import { mountControls } from './canvas/controls.js';
+import { mountMinimap } from './canvas/minimap.js';
+import { mountSimulation } from './canvas/simulate.js';
+import { fitToScreen, initialFit } from './canvas/view-actions.js';
 import { mountPalette } from './ui/palette.js';
 import { mountInspector } from './ui/inspector.js';
 import { mountLive } from './ui/live.js';
@@ -56,16 +62,36 @@ function getModel(state) {
 
 const wrap = document.getElementById('canvas-wrap');
 const svg = mountCanvas(wrap, store);
+attachPanZoom(svg, store);
 attachNodeDrag(svg, store);
+attachConnectDrag(svg, store);
 attachKeyboard(svg, store);
+mountMinimap(wrap, svg, store);
+mountControls(wrap, svg, store, restoreTemplate);
+mountSimulation(document.getElementById('stage-actions'), svg, store);
 mountPalette({
   palette: document.getElementById('palette'),
   toggle: document.getElementById('palette-toggle'),
-  list: document.getElementById('palette-list'),
+  panel: document.getElementById('palette-panel'),
   wrap,
   svg,
   store,
 });
+
+// Encuadre inicial: en cuanto el lienzo tiene tamano (tambien si nace oculto).
+let fitted = false;
+new ResizeObserver(() => {
+  if (!fitted && wrap.clientWidth > 0 && wrap.clientHeight > 0) {
+    fitted = true;
+    initialFit(store, svg);
+  }
+}).observe(wrap);
+
+function restoreTemplate() {
+  clearDraft();
+  store.dispatch({ type: 'LOAD_TEMPLATE' });
+  fitToScreen(store, svg);
+}
 mountInspector(document.getElementById('inspector'), store);
 mountLive(document.getElementById('live'), store);
 mountRecipe(document.getElementById('recipe'), document.getElementById('recipe-body'), store);
@@ -76,6 +102,7 @@ mountNarrative(document.getElementById('narrative'), store);
 // Vistas: una visible a la vez; al navegar el foco pasa al encabezado principal.
 const navButtons = Array.from(document.querySelectorAll('[data-view]'));
 function showView(view, moveFocus) {
+  document.body.dataset.view = view;
   VIEWS.forEach((name) => {
     document.getElementById(`view-${name}`).hidden = name !== view;
   });
@@ -87,7 +114,7 @@ function showView(view, moveFocus) {
     }
   });
   if (moveFocus) {
-    window.scrollTo(0, 0);
+    document.getElementById('main').scrollTo(0, 0);
     document.querySelector(`#view-${view} h1`).focus();
   }
 }
@@ -101,11 +128,6 @@ store.subscribe(
   (view) => showView(view, true),
 );
 showView(store.getState().ui.view, false);
-
-document.getElementById('restore-template').addEventListener('click', () => {
-  clearDraft();
-  store.dispatch({ type: 'LOAD_TEMPLATE' });
-});
 
 // Borrador: se guarda 500 ms despues del ultimo cambio; si no hay localStorage, se ignora.
 let draftTimer = null;

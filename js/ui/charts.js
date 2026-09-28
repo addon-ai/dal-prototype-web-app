@@ -3,12 +3,12 @@ import { svgEl } from '../canvas/shapes.js';
 import { formatNumber } from '../domain/format.js';
 import { h, icon } from './dom.js';
 
-const W = 340;
-const H = 150;
-const LEFT = 40;
-const BOTTOM = 22;
-const STEP = 10;
-const BAR = 7;
+const W = 900;
+const H = 280;
+const LEFT = 56;
+const BOTTOM = 30;
+const STEP = 27;
+const BAR = 19;
 
 const STATUS = {
   normal: { label: 'Normal', d: 'M5 13l4 4L19 7' },

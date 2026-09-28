@@ -5,8 +5,12 @@ import { PRICING } from './pricing.config.js';
 import { computeMetrics } from './domain/metrics.js';
 import { computeInvoice } from './domain/costs.js';
 import { formatCurrency } from './domain/format.js';
+import { UI_HANDLERS, IDLE_SIM, INITIAL_VIEWPORT, withNotice } from './reducer-ui.js';
 
-export const GRID = { stepX: 230, stepY: 110, startX: 30, startY: 30, columns: 4 };
+export const GRID = { stepX: 236, stepY: 130, startX: 40, startY: 40, columns: 4 };
+const COORD_MIN = -2000;
+const COORD_MAX = 6000;
+const clampCoord = (value) => Math.min(COORD_MAX, Math.max(COORD_MIN, Math.round(value)));
 
 export function createInitialState(graph = cloneTemplateGraph()) {
   return {
@@ -17,15 +21,10 @@ export function createInitialState(graph = cloneTemplateGraph()) {
       view: 'constructor',
       notice: null,
       noticeSeq: 0,
+      viewport: INITIAL_VIEWPORT,
+      sim: IDLE_SIM,
     },
     scenario: { casosMes: 3000 },
-  };
-}
-
-function withNotice(state, text, patch = {}) {
-  return {
-    ...state,
-    ui: { ...state.ui, ...patch, notice: text, noticeSeq: state.ui.noticeSeq + 1 },
   };
 }
 
@@ -49,7 +48,7 @@ function nextFreePosition(nodes) {
     const x = GRID.startX + (i % GRID.columns) * GRID.stepX;
     const y = GRID.startY + Math.floor(i / GRID.columns) * GRID.stepY;
     const busy = nodes.some(
-      (node) => Math.abs(node.x - x) < GRID.stepX - 20 && Math.abs(node.y - y) < GRID.stepY - 20,
+      (node) => Math.abs(node.x - x) < GRID.stepX - 40 && Math.abs(node.y - y) < GRID.stepY - 30,
     );
     if (!busy) {
       return { x, y };
@@ -74,8 +73,8 @@ function addStep(state, { step, x, y }) {
     id,
     step,
     label: entry.label,
-    x: Math.max(0, Math.round(pos.x)),
-    y: Math.max(0, Math.round(pos.y)),
+    x: clampCoord(pos.x),
+    y: clampCoord(pos.y),
     settings: defaultSettings(step),
   };
   const graph = { ...state.graph, nodes: [...state.graph.nodes, node] };
@@ -88,8 +87,8 @@ function moveStep(state, { id, x, y, announce }) {
   if (!target) {
     return state;
   }
-  const nx = Math.max(0, Math.round(x));
-  const ny = Math.max(0, Math.round(y));
+  const nx = clampCoord(x);
+  const ny = clampCoord(y);
   if (nx === target.x && ny === target.y) {
     return state;
   }
@@ -201,6 +200,7 @@ const HANDLERS = {
     }),
   SET_VOLUME: (state, { casosMes }) => ({ ...state, scenario: { ...state.scenario, casosMes } }),
   SET_VIEW: (state, { view }) => ({ ...state, ui: { ...state.ui, view } }),
+  ...UI_HANDLERS,
 };
 
 export function reducer(state, action) {

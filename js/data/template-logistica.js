@@ -22,18 +22,18 @@ const TEMPLATE = {
     name: 'Asistente de seguimiento de envíos',
     version: '1.0.0',
     nodes: [
-      node('guard_in', 'seguridad', 'Filtrar datos sensibles', 30, 150),
-      node('clasificar', 'entiende', 'Entender la consulta', 230, 150, {
+      node('guard_in', 'seguridad', 'Filtrar datos sensibles', 30, 120),
+      node('clasificar', 'entiende', 'Entender la consulta', 266, 120, {
         creatividad: 0.2,
         largo: 300,
       }),
-      node('buscar_politica', 'documentos', 'Consultar políticas y manuales', 440, 30, {
+      node('buscar_politica', 'documentos', 'Consultar políticas y manuales', 502, 10, {
         fuente: 'politicas-compensacion',
       }),
-      node('consultar_tms', 'sistemas', 'Consultar sistema de transporte', 440, 270),
-      node('regla_retraso', 'regla', '¿Retraso crítico?', 660, 270),
-      node('aprobar', 'aprobacion', 'Aprobación del supervisor', 660, 390),
-      node('responder', 'entiende', 'Redactar respuesta', 860, 150, {
+      node('consultar_tms', 'sistemas', 'Consultar sistema de transporte', 502, 240),
+      node('regla_retraso', 'regla', '¿Retraso crítico?', 738, 240),
+      node('aprobar', 'aprobacion', 'Aprobación del supervisor', 974, 370),
+      node('responder', 'entiende', 'Redactar respuesta', 1210, 120, {
         creatividad: 0.4,
         largo: 500,
       }),

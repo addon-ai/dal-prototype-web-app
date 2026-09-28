@@ -15,6 +15,15 @@ commit `f4fce1e`. Las reglas de React/TypeScript de la app no aplican aquí.
 Todas las cifras (métricas, costos, precios por modelo) son **datos mock ilustrativos**, generados de
 forma determinista a partir del grafo. No representan precios reales ni resultados de producción.
 
+## Constructor (app shell a pantalla completa)
+
+La app ocupa 100vw x 100dvh: barra superior compacta, paleta lateral colapsable (con busqueda y
+acordeon por categoria), lienzo central con zoom/paneo (rueda, arrastrar el fondo, botones, teclas
+`+`, `-`, `0`), minimapa, controles flotantes y "Probar recorrido" (simulacion con datos mock).
+El inspector es una tercera columna desde 1600 px, un panel lateral flotante entre 768 y 1599 px y
+una hoja inferior en movil. El zoom/paneo y la simulacion viven en `ui` del store y no forman parte
+de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (ver su cabecera).
+
 ## Abrirlo en local
 
 ```bash

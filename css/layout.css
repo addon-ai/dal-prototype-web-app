@@ -1,23 +1,32 @@
-/* Layout mobile-first. Breakpoints: 768px (tablet), 1100px (laptop). */
+/* App shell a pantalla completa (100vw x 100dvh). Mobile-first.
+   Breakpoints: 768px (tablet: paleta + lienzo, inspector lateral flotante),
+   1600px (escritorio ancho: inspector siempre visible como tercera columna). Solo tokens. */
 
-.app-header {
-  position: sticky;
-  inset-block-start: 0;
-  z-index: 20;
+body {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.topbar {
+  position: relative;
+  z-index: 50;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2) var(--space-4);
+  gap: var(--space-2) var(--space-3);
   min-height: var(--header-height);
-  padding: var(--space-2) var(--content-padding);
+  padding: var(--space-1) var(--content-padding);
   background: var(--color-bg-card);
   border-block-end: var(--border-width) solid var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  margin-inline-end: auto;
+  margin-inline-end: var(--space-2);
 }
 
 .brand__logo {
@@ -25,7 +34,8 @@
   width: auto;
 }
 
-.brand__logo--dark {
+.brand__logo--dark,
+.brand__icon {
   display: none;
 }
 
@@ -37,35 +47,65 @@
   display: block;
 }
 
+/* Movil: solo el icono de marca, para que la navegacion quepa en 375px */
+@media (max-width: 767px) {
+  .brand__logo--light,
+  [data-theme='dark'] .brand__logo--dark {
+    display: none;
+  }
+
+  .brand__icon {
+    display: block;
+    width: var(--logo-height);
+    height: var(--logo-height);
+  }
+
+  .topbar {
+    gap: var(--space-1);
+  }
+
+  .topbar .main-nav__btn {
+    padding-inline: var(--space-2);
+    font-size: var(--font-size-sm);
+  }
+}
+
 .main-nav {
-  order: 3;
-  width: 100%;
+  min-width: 0;
+  margin-inline-end: auto;
 }
 
 .main-nav__list {
   display: flex;
   gap: var(--space-1);
-  overflow-x: auto;
 }
 
 .main-nav__btn {
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-lg);
   border: var(--border-width) solid transparent;
   color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .main-nav__btn:hover {
   background: var(--color-bg-raised);
+  color: var(--color-text-primary);
 }
 
 .main-nav__btn[aria-current='page'] {
   color: var(--color-text-primary);
-  background: var(--color-accent-light);
-  border-color: var(--color-border-control);
+  background: var(--color-accent-soft);
   box-shadow: inset 0 calc(var(--stroke-bold) * -1) 0 var(--color-accent);
+}
+
+.tag.topbar__tag {
+  display: none;
 }
 
 .theme-toggle .icon--moon {
@@ -81,26 +121,28 @@
 }
 
 .app-main {
-  width: 100%;
-  max-width: var(--content-max-width);
-  margin-inline: auto;
-  padding: var(--space-4) var(--content-padding);
-  /* Reserva espacio para la hoja inferior de la paleta en movil */
-  padding-block-end: calc(var(--tap-min) + var(--space-8));
+  position: relative;
+  min-height: 0;
+  overflow: auto;
+}
+
+body[data-view='constructor'] .app-main {
+  overflow: hidden;
 }
 
 .view {
-  display: grid;
-  gap: var(--space-4);
   min-width: 0;
 }
 
-.view__head {
+/* Vistas de lectura: ocupan todo el ancho, con rejilla responsiva de tarjetas */
+.view--page {
   display: grid;
-  gap: var(--space-2);
+  align-content: start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--content-padding) var(--space-8);
 }
 
-.view__head h1 {
+.view--page > h1 {
   overflow-wrap: anywhere;
 }
 
@@ -109,30 +151,14 @@
   align-items: center;
   gap: var(--space-1);
   width: fit-content;
+  max-width: 100%;
   padding: var(--space-1) var(--space-3);
   border: var(--border-width) solid var(--color-border-control);
   border-radius: var(--radius-full);
   background: var(--color-status-warn-bg);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
-}
-
-.builder {
-  display: grid;
-  gap: var(--space-4);
-  min-width: 0;
-}
-
-.builder > * {
-  min-width: 0;
-}
-
-.canvas-wrap {
-  min-height: var(--canvas-min-height);
-  overflow: auto;
-  border: var(--border-width) solid var(--canvas-border);
-  border-radius: var(--radius-xl);
-  background: var(--canvas-bg);
+  line-height: var(--line-height-normal);
 }
 
 .panel {
@@ -147,52 +173,103 @@
   margin-block-end: var(--space-3);
 }
 
-/* Paleta: hoja inferior en movil (< 768px) */
-.palette {
-  position: fixed;
-  inset-inline: 0;
-  inset-block-end: 0;
-  z-index: 30;
-  max-height: var(--sheet-max-height);
-  overflow-y: auto;
-  padding: var(--space-2) var(--content-padding);
-  border-block-start: var(--border-width) solid var(--color-border-control);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  background: var(--color-bg-card);
-  box-shadow: var(--shadow-lg);
-}
-
-.palette__toggle {
-  width: 100%;
-}
-
-.palette__list {
-  display: none;
-  gap: var(--space-2);
-  margin-block-start: var(--space-2);
-}
-
-.palette[data-open='true'] .palette__list {
+/* Constructor: paleta | escenario | inspector; en movil paleta e inspector son hojas inferiores */
+.view--builder {
+  position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+  padding-block-end: calc(var(--tap-min) + var(--space-4));
 }
 
-/* Receta tecnica colapsada */
+.stage {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--canvas-bg);
+}
+
+.stage__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  min-height: var(--tap-min);
+  padding: var(--space-1) var(--content-padding);
+  border-block-end: var(--border-width) solid var(--color-border);
+  background: var(--color-bg-card);
+}
+
+/* Titulo, acciones y rotulo del escenario comparten fila; el rotulo va al final (al lado del
+   inspector flotante no tapa la accion principal) */
+.stage__title {
+  display: contents;
+}
+
+.stage__title h1 {
+  flex: 1 1 100%;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-lg);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage__hint {
+  display: none;
+  flex-basis: 100%;
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: none;
+}
+
+.stage__scenario {
+  order: 2;
+  margin-inline-start: 0;
+  flex: 1 1 8rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage__actions {
+  display: flex;
+  order: 1;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Receta acoplada bajo el lienzo; abierta, cede hasta 45 % de la altura */
 .recipe {
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-xl);
+  flex: none;
+  border-block-start: var(--border-width) solid var(--color-border);
   background: var(--color-bg-card);
 }
 
 .recipe > summary {
   display: flex;
   align-items: center;
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-1) var(--content-padding);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
 }
 
+.recipe[open] {
+  max-height: 45dvh;
+  overflow-y: auto;
+}
+
 .recipe__body {
-  padding: var(--space-4);
+  padding: var(--space-2) var(--content-padding) var(--space-4);
   border-block-start: var(--border-width) solid var(--color-border-light);
 }
 
@@ -201,54 +278,58 @@
     --content-padding: var(--space-6);
   }
 
-  .app-header {
-    flex-wrap: nowrap;
+  .tag.topbar__tag {
+    display: inline-flex;
   }
 
-  .main-nav {
-    order: 0;
-    width: auto;
-  }
-
-  .app-main {
-    padding-block-end: var(--space-8);
-  }
-
-  .builder {
+  .view--builder {
     grid-template-columns: var(--palette-width) minmax(0, 1fr);
-    align-items: start;
+    padding-block-end: 0;
+    transition: grid-template-columns var(--transition-panel);
   }
 
-  .builder__inspector {
-    grid-column: 1 / -1;
+  .view--builder[data-palette='collapsed'] {
+    grid-template-columns: var(--palette-width-collapsed) minmax(0, 1fr);
   }
 
-  /* La paleta deja de ser hoja y pasa a columna lateral */
-  .palette {
-    position: static;
-    max-height: none;
-    padding: var(--space-4);
-    border: var(--border-width) solid var(--color-border);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-sm);
+  .stage__title h1 {
+    flex: 0 1 auto;
   }
 
-  .palette__toggle {
-    display: none;
-  }
-
-  .palette__list {
-    display: grid;
-    margin-block-start: 0;
+  .stage__scenario {
+    flex: 0 1 auto;
+    margin-inline-start: auto;
+    line-height: var(--line-height-normal);
   }
 }
 
-@media (min-width: 1100px) {
-  .builder {
+@media (min-width: 1600px) {
+  .stage__title {
+    display: flex;
+    flex: 1 1 0;
+    flex-wrap: wrap;
+    gap: 0 var(--space-3);
+    align-items: center;
+    min-width: 0;
+    order: 0;
+  }
+
+  .stage__scenario {
+    order: 0;
+    margin-inline-start: 0;
+  }
+
+  .stage__hint {
+    display: block;
+  }
+
+  .view--builder {
     grid-template-columns: var(--palette-width) minmax(0, 1fr) var(--inspector-width);
   }
 
-  .builder__inspector {
-    grid-column: auto;
+  .view--builder[data-palette='collapsed'] {
+    grid-template-columns:
+      var(--palette-width-collapsed) minmax(0, 1fr)
+      var(--inspector-width);
   }
 }
