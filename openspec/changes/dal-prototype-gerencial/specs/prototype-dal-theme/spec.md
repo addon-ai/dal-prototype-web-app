@@ -24,13 +24,19 @@ El prototipo MUST definir tokens como CSS custom properties en capas primitive, 
 
 ### Requirement: Modo claro y oscuro
 
-El prototipo MUST arrancar en claro (sin `data-theme-palette`) y MUST ofrecer un conmutador que aplique `data-theme="dark"`. La elección SHOULD persistir en `localStorage` con degradación segura si no está disponible.
+El prototipo MUST ofrecer claro y oscuro con un botón de tema visible en la barra superior (junto al avatar) y en la pantalla de acceso, además del control del panel de cuenta, todos sincronizados. En la primera visita MUST respetar `prefers-color-scheme`; después, la preferencia guardada en `localStorage` (con degradación segura si no está disponible). Un script previo al primer pintado MUST aplicar `data-theme` en `<html>` y `<meta name="theme-color">` sin parpadeo. El botón MUST medir ≥44px y tener `aria-label` dinámico ("Cambiar a modo oscuro"/"Cambiar a modo claro").
 
 #### Scenario: Cambio a oscuro
 
 - GIVEN la página cargada en modo claro
 - WHEN la persona activa el conmutador de tema
 - THEN `<html>` tiene `data-theme="dark"` y los tokens semantic cambian
+
+#### Scenario: Primera visita con sistema oscuro
+
+- GIVEN sin preferencia guardada y `prefers-color-scheme: dark`
+- WHEN se carga la página
+- THEN `<html>` tiene `data-theme="dark"` desde el primer pintado
 
 ### Requirement: Marca, tipografía y fallback
 

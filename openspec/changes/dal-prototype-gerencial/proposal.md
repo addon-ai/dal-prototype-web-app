@@ -12,7 +12,7 @@ DAL hoy solo lo entienden perfiles técnicos. Para validar "Addon AI" con una em
 - Constructor de pasos tipo n8n: arrastrar y soltar, con alternativa de teclado y táctil, y lenguaje de negocio.
 - Plantilla logística editable: seguimiento de envíos con atención de reclamos.
 - Vista colapsable "Receta técnica (para TI)" con JSON y YAML en vivo.
-- Estadísticas simuladas y costos por servicio facturable al consumidor, rotulados "Datos de ejemplo" y "Precios ilustrativos".
+- Estadísticas simuladas y costos por servicio facturable al consumidor, rotulados "Precios ilustrativos" (el badge "Datos de ejemplo" se retiró después).
 - Pantalla de narrativa de validación (borrador).
 
 ### Out of Scope

@@ -36,7 +36,7 @@ de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (
   Los agentes creados y los cambios de nombre/avatar se guardan en `dal-proto-agents-v1` (localStorage,
   opcional); los creados se pueden eliminar con confirmación.
 - **Rutas por hash**: `#/agentes`, `#/constructor/:id`, `#/resultados/:id` (solo hash, sin red).
-- **Cuenta**: el avatar de la barra abre un panel con usuario y empresa de ejemplo, tema, cristal y
+- **Cuenta**: el avatar de la barra abre un panel con usuario y empresa de ejemplo, tema (también visible en la barra y en el acceso), cristal y
   "Cerrar sesión".
 
 ## Acceso de demostración y efecto cristal
@@ -49,6 +49,12 @@ de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (
   (`data-glass="on|off"` en `<html>`, preferencia opcional en localStorage `dal-proto-glass`). Tokens
   `--glass-*` en `css/tokens.css` (3 capas) y reglas en `css/glass.css`. Con `off`, sin soporte de
   `backdrop-filter` o con `prefers-reduced-transparency`, las superficies son sólidas.
+- **Tema claro/oscuro**: botón sol/luna en la barra (junto al avatar), en el acceso y en la cuenta, todos sincronizados
+  (`aria-label` dinámico, 44 px). Primera visita: `prefers-color-scheme`; después, `dal-proto-theme` en
+  `localStorage` (opcional). El script de `index.html` fija `data-theme` y `theme-color` antes del primer pintado.
+  Contraste de pares de tokens (WCAG): mínimo 4,66:1 en claro y 4,85:1 en oscuro para texto (3:1 en no textuales).
+- **Sin badge "Datos de ejemplo"**: se retiró de barra, Agentes, cuenta, Resultados y constructor; se conservan
+  "Precios ilustrativos", los avisos de "no es una oferta" y la marca "(ejemplo)" de la empresa ficticia.
 - **Contraste del efecto cristal**: alfas mínimos de superficie medidos con WCAG (>= 4.5:1) sobre el peor
   fondo (orbes apilados y contenido saturado al 30 % detrás): claro 4,59-4,75; oscuro 4,54-4,72.
 - **Ajustes del paso contraíbles**: el panel derecho se contrae a un riel (botón con `aria-expanded`;
@@ -94,7 +100,8 @@ debe cargar sin errores y exponer sus funciones exportadas.
 - [ ] Mouse: seleccionar, arrastrar y conectar nodos en el lienzo.
 - [ ] Teclado: recorrer con Tab, operar el lienzo y los paneles solo con teclado; foco siempre visible.
 - [ ] Táctil: arrastre y toques funcionan en un dispositivo táctil o emulado.
-- [ ] Tema claro y oscuro: ambos legibles; cambia con la preferencia del sistema.
+- [ ] Tema claro y oscuro: botón visible en la barra superior y en el acceso; la primera visita sigue `prefers-color-scheme` y luego la preferencia guardada; ambos temas legibles, con cristal activado y desactivado.
+- [ ] No hay badges "Datos de ejemplo" en ninguna vista (se conservan "Precios ilustrativos" y "(ejemplo)" de la empresa ficticia).
 - [ ] Ancho de 375 px: sin scroll horizontal de página; paneles utilizables.
 - [ ] Contraste AA: texto normal >= 4.5:1 y texto grande/componentes >= 3:1 en ambos temas (DevTools > inspector de contraste).
 - [ ] `prefers-reduced-motion`: sin animaciones no esenciales.

@@ -1,11 +1,14 @@
-// Conmutador de tema claro/oscuro. Persiste la eleccion en localStorage (opcional).
+// Conmutador de tema claro/oscuro. Primera visita: prefers-color-scheme; luego la preferencia
+// guardada en localStorage (opcional: sin el, la app funciona y sigue al sistema).
 const STORAGE_KEY = 'dal-proto-theme';
 const DARK = 'dark';
 const LIGHT = 'light';
+const scheme = window.matchMedia('(prefers-color-scheme: dark)');
 
 function readSavedTheme() {
   try {
-    return window.localStorage.getItem(STORAGE_KEY);
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    return saved === DARK || saved === LIGHT ? saved : null;
   } catch (error) {
     return null;
   }
@@ -23,35 +26,47 @@ export function getTheme() {
   return document.documentElement.getAttribute('data-theme') === DARK ? DARK : LIGHT;
 }
 
+function syncMeta() {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const surface = getComputedStyle(document.documentElement).getPropertyValue('--color-bg-card');
+  if (meta && surface.trim()) {
+    meta.setAttribute('content', surface.trim());
+  }
+}
+
+function syncButtons(buttons) {
+  const label = getTheme() === DARK ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+  buttons.forEach((button) => {
+    button.setAttribute('aria-label', label);
+    button.setAttribute('title', label);
+  });
+}
+
 export function applyTheme(theme) {
-  if (theme === DARK) {
-    document.documentElement.setAttribute('data-theme', DARK);
-  } else {
-    document.documentElement.removeAttribute('data-theme');
-  }
+  document.documentElement.setAttribute('data-theme', theme === DARK ? DARK : LIGHT);
+  syncMeta();
 }
 
-function syncButton(button) {
-  const isDark = getTheme() === DARK;
-  button.setAttribute('aria-pressed', String(isDark));
-  button.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-}
-
-export function initTheme(button) {
-  if (!button) {
-    return;
-  }
-  if (readSavedTheme() === DARK) {
-    applyTheme(DARK);
-  }
-  syncButton(button);
-  button.addEventListener('click', () => {
-    const next = getTheme() === DARK ? LIGHT : DARK;
-    applyTheme(next);
-    saveTheme(next);
-    syncButton(button);
+export function initTheme(buttons) {
+  const list = Array.from(buttons);
+  applyTheme(readSavedTheme() || (scheme.matches ? DARK : LIGHT));
+  syncButtons(list);
+  list.forEach((button) => {
+    button.addEventListener('click', () => {
+      const next = getTheme() === DARK ? LIGHT : DARK;
+      applyTheme(next);
+      saveTheme(next);
+      syncButtons(list);
+    });
+  });
+  // Sin preferencia guardada, el tema sigue al sistema en vivo.
+  scheme.addEventListener('change', () => {
+    if (!readSavedTheme()) {
+      applyTheme(scheme.matches ? DARK : LIGHT);
+      syncButtons(list);
+    }
   });
 }
 
 // Los modulos se ejecutan diferidos: el DOM ya esta listo.
-initTheme(document.getElementById('theme-toggle'));
+initTheme(document.querySelectorAll('[data-theme-toggle]'));

@@ -166,6 +166,14 @@
   font-size: var(--font-size-xs);
 }
 
+/* Boton de tema de la pantalla de acceso: esquina superior derecha */
+.login__theme {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: var(--space-4);
+  inset-inline-end: var(--space-4);
+}
+
 /* Cerrar sesion: texto visible desde tablet; en movil solo el icono */
 .logout-btn__text {
   display: none;

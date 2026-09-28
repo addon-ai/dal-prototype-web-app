@@ -21,7 +21,6 @@ export function mountAgents(view, store, openAgent, createNew) {
   const state = { filter: 'todos', query: '', sort: 'recientes' };
 
   const intro = h('p', 'agents__intro', 'Hola, Camila. Estos son los agentes de Transportes Andina S.A.S. (ejemplo).');
-  const tag = h('p', 'tag', 'Datos de ejemplo');
   const bar = h('div', 'agents__bar');
   const filters = h('div', 'agents__filters');
   filters.setAttribute('role', 'group');
@@ -44,7 +43,7 @@ export function mountAgents(view, store, openAgent, createNew) {
   status.setAttribute('role', 'status');
   const grid = h('ul', 'agents__grid');
   bar.append(filters, search, sortSelect);
-  root.append(intro, tag, bar, status, grid);
+  root.append(intro, bar, status, grid);
 
   function paintFilters() {
     filters.replaceChildren();

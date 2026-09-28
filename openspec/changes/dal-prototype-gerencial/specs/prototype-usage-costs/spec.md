@@ -8,13 +8,13 @@ Estadísticas simuladas y costos por servicio facturable al consumidor, con cifr
 
 ### Requirement: KPIs de negocio simulados
 
-La vista MUST mostrar casos atendidos (hoy/semana/mes), tasa de éxito, tiempo típico y peor caso de respuesta, casos bloqueados por seguridad, aprobaciones pendientes y cumplimiento de plazo. Los datos MUST ser deterministas (semilla fija) y rotulados "Datos de ejemplo". MUST NOT mostrar métricas internas (DLQ, circuit-breaker, calidad RAG, salud de proveedores).
+La vista MUST mostrar casos atendidos (hoy/semana/mes), tasa de éxito, tiempo típico y peor caso de respuesta, casos bloqueados por seguridad, aprobaciones pendientes y cumplimiento de plazo. Los datos MUST ser deterministas (semilla fija). Ya no llevan badge "Datos de ejemplo" (retirado por decisión de producto); la naturaleza ilustrativa se conserva en "Precios ilustrativos" y en la empresa ficticia "(ejemplo)". MUST NOT mostrar métricas internas (DLQ, circuit-breaker, calidad RAG, salud de proveedores).
 
-#### Scenario: Rótulo de datos
+#### Scenario: Cifras deterministas
 
 - GIVEN la vista de estadísticas
 - WHEN se carga
-- THEN se lee "Datos de ejemplo" y dos cargas producen las mismas cifras
+- THEN dos cargas producen las mismas cifras y no hay badge "Datos de ejemplo"
 
 ### Requirement: Datos estáticos, sin servicios
 

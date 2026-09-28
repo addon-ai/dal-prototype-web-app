@@ -87,10 +87,7 @@ function buildBody(model) {
 
 export function mountStats(root, store, getModel) {
   const head = h('div', 'section-head');
-  head.append(
-    h('h2', '', 'Cómo rinde el asistente'),
-    h('p', 'tag tag--example', 'Datos de ejemplo'),
-  );
+  head.append(h('h2', '', 'Cómo rinde el asistente'));
   const body = h('div', 'stats-grid');
   const volume = volumeControl(store);
   root.replaceChildren(head, volume, body);

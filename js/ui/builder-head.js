@@ -31,7 +31,7 @@ export function mountBuilderHead(store, view) {
     paintTitle(results, agent, 40, 'Resultados y costos: ');
     edit.setAttribute('aria-label', `Editar nombre y avatar de ${agent.name}`);
     hint.textContent = agent.description;
-    scenario.textContent = 'Datos de ejemplo · Transportes Andina S.A.S. (ejemplo)';
+    scenario.textContent = 'Transportes Andina S.A.S. (ejemplo)';
   };
   store.subscribe((state) => `${state.ui.agentId}|${state.ui.agentsRev}`, (_v, state) => paint(state));
 }

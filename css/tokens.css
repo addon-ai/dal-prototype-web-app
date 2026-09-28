@@ -28,6 +28,7 @@
   --p-teal-600: #338a7b;
   --p-green-500: #12d27c;
   --p-green-600: #0ea863;
+  --p-green-400: #3fe293;
   --p-green-700: #0a8044;
   --p-green-900: #065f36;
   --p-coral-500: #ef8b72;
@@ -43,6 +44,7 @@
   --p-gray-200: #eaf0f5;
   --p-gray-250: #d0dce8;
   --p-gray-300: #b9c9db;
+  --p-slate-350: #a7b5c9;
   --p-slate-400: #94a3b8;
   --p-slate-500: #8ba3b8;
   --p-slate-600: #64748b;
@@ -52,13 +54,13 @@
   --p-slate-900: #0f172a;
 
   /* Textos de estado (claro / oscuro) */
-  --p-status-ok-light: #15803d;
-  --p-status-warn-light: #a16207;
+  --p-status-ok-light: #166534;
+  --p-status-warn-light: #854d0e;
   --p-status-crit-light: #b91c1c;
   --p-status-info-light: #1d4ed8;
   --p-status-ok-dark: #34d399;
   --p-status-warn-dark: #fbbf24;
-  --p-status-crit-dark: #f87171;
+  --p-status-crit-dark: #fb8585;
   --p-status-info-dark: #60a5fa;
 
   /* Sombras */
@@ -183,7 +185,7 @@
 
   --color-btn-primary-bg: var(--p-green-500);
   --color-btn-primary-text: var(--p-blue-900);
-  --color-btn-primary-hover: var(--p-green-600);
+  --color-btn-primary-hover: var(--p-green-400);
 
   --color-status-ok: var(--p-status-ok-light);
   --color-status-warn: var(--p-status-warn-light);
@@ -227,8 +229,8 @@
   --color-accent-soft: color-mix(in srgb, var(--color-accent) 18%, transparent);
 
   --color-text-primary: var(--p-gray-100);
-  --color-text-secondary: var(--p-slate-400);
-  --color-text-muted: var(--p-slate-400);
+  --color-text-secondary: var(--p-slate-350);
+  --color-text-muted: var(--p-slate-350);
 
   --color-bg-page: var(--p-slate-900);
   --color-bg-card: var(--p-slate-800);

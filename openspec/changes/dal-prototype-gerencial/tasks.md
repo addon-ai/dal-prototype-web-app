@@ -47,7 +47,7 @@ Reglas transversales: todo mockeado, sin red (solo Google Fonts); rutas relativa
 
 - [x] 5.1 Crear `prototype/js/ui/recipe.js`: pestañas JSON/YAML, `aria-expanded` del `<details>`, botón "Copiar" con `aria-live`, manejo de fallo del portapapeles. (recipe-view: todos los escenarios)
 - [x] 5.2 Crear `prototype/js/ui/charts.js`: gráficos SVG propios con `<title>`, leyenda, tabla/`aria-label`, patrón o etiqueta directa. (usage-costs: Gráficos accesibles)
-- [x] 5.3 Crear `prototype/js/ui/stats.js`: KPIs de negocio con rótulo "Datos de ejemplo", sin métricas internas. (usage-costs: KPIs)
+- [x] 5.3 Crear `prototype/js/ui/stats.js`: KPIs de negocio (el badge "Datos de ejemplo" se retiró), sin métricas internas. (usage-costs: KPIs)
 - [x] 5.4 Crear `prototype/js/ui/costs.js`: líneas de costo, barras consumo vs cupo con icono+etiqueta de estado, "Precios ilustrativos" junto al total y aviso de no-oferta. (usage-costs: Consumo frente a cupo, Rótulo ilustrativo)
 - [x] 5.5 Crear `prototype/js/ui/narrative.js`: 5 secciones h2 en orden, "Borrador: confirmar en sesión 2", enlaces a constructor y costos, foco al h1/h2 al navegar. (validation-narrative: Orden, Navegación, Móvil)
 - [x] 5.6 Crear `prototype/css/panels.css` con tokens únicamente; botón "Restaurar plantilla" cableado a `LOAD_TEMPLATE`. (logistics: Restaurar)

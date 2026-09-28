@@ -117,7 +117,7 @@ function valuesTable(serie) {
 export function casesChart(serie) {
   const total = serie.reduce((acc, item) => acc + item.casos, 0);
   const peak = serie.reduce((a, b) => (b.casos > a.casos ? b : a));
-  const title = 'Casos atendidos por día (datos de ejemplo)';
+  const title = 'Casos atendidos por día';
   const summary = `Total del mes ${formatNumber(total)} casos; el día más alto es el ${peak.dia} con ${formatNumber(peak.casos)}.`;
   const figure = h('figure', 'chart');
   const caption = h('figcaption', 'chart__title', title);
