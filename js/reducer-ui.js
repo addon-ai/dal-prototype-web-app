@@ -26,7 +26,7 @@ function setViewport(state, { viewport }) {
 
 function simStart(state) {
   const sim = { ...IDLE_SIM, status: 'running' };
-  return withNotice(state, 'Recorrido de prueba iniciado con datos de ejemplo.', { sim });
+  return withNotice(state, 'Recorrido de prueba iniciado.', { sim });
 }
 
 function simStep(state, { nodeId, edgeIds, label }) {
