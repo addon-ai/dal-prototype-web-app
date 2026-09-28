@@ -12,67 +12,16 @@
   place-items: center;
   overflow: auto;
   padding: var(--space-6) var(--space-4);
-  background: var(--color-bg-page);
+  background: var(--bg-backdrop);
   transition:
     opacity var(--transition-slow),
     transform var(--transition-slow);
-}
-
-[data-glass='on'] .login {
-  background: var(--glass-page-bg);
 }
 
 .login--leaving {
   opacity: 0;
   transform: scale(1.03);
   pointer-events: none;
-}
-
-/* Orbes difusos: solo con cristal activado; dan color al desenfoque de la tarjeta */
-.login__orb {
-  display: none;
-  position: absolute;
-  width: 46vmax;
-  height: 46vmax;
-  border-radius: var(--radius-full);
-  pointer-events: none;
-}
-
-[data-glass='on'] .login__orb {
-  display: block;
-}
-
-.login__orb--a {
-  inset-block-start: 4vmax;
-  inset-inline-start: calc(50% - 40vmax);
-  background: radial-gradient(circle, var(--glass-orb-a), transparent 68%);
-}
-
-.login__orb--b {
-  inset-block-end: 2vmax;
-  inset-inline-end: calc(50% - 34vmax);
-  background: radial-gradient(circle, var(--glass-orb-b), transparent 68%);
-  animation-duration: 34s;
-  animation-direction: alternate-reverse;
-}
-
-.login__orb--c {
-  inset-block-start: 10%;
-  inset-inline-start: calc(50% - 8vmax);
-  width: 34vmax;
-  height: 34vmax;
-  background: radial-gradient(circle, var(--glass-orb-c), transparent 68%);
-  animation-duration: 40s;
-}
-
-@keyframes login-drift {
-  from {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  to {
-    transform: translate3d(4vmax, 3vmax, 0) scale(1.08);
-  }
 }
 
 .login__card {

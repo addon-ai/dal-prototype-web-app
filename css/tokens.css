@@ -455,3 +455,95 @@
   --glass-sheen: linear-gradient(135deg, var(--glass-sheen-from), var(--glass-sheen-to) 42%);
   --glass-ring: inset 0 1px 0 var(--glass-specular), inset 0 0 0 1px var(--glass-border);
 }
+
+/* ── Fondo de la app (identidad de la landing de Addon AI) ───
+   Fondo azul noche / gris hielo con resplandores verde-cian-teal, rejilla de 60 px
+   con puntos y nodos dispersos. Es estatico (sin animacion ni desenfoque). Se aplica
+   a login, Agentes y Resultados (css/backdrop.css); el Constructor conserva su lienzo.
+   La landing solo trae el modo oscuro y su tono claro (#f0f4f8); el claro conserva
+   los mismos tonos de marca con resplandores algo mas opacos para que se lean. */
+
+/* Capa 1: primitive (unicos valores literales del fondo) */
+:root {
+  --p-bg-base-dark: #050a14;
+  --p-bg-base-light: #f0f4f8;
+  --p-bg-glow-green-dark: rgba(18, 210, 124, 0.12);
+  --p-bg-glow-cyan-dark: rgba(6, 182, 212, 0.09);
+  --p-bg-glow-teal-dark: rgba(51, 138, 123, 0.14);
+  --p-bg-glow-emerald-dark: rgba(34, 197, 94, 0.08);
+  --p-bg-glow-green-light: rgba(110, 231, 183, 0.3);
+  --p-bg-glow-cyan-light: rgba(125, 211, 252, 0.26);
+  --p-bg-glow-teal-light: rgba(94, 234, 212, 0.24);
+  --p-bg-glow-emerald-light: rgba(167, 243, 208, 0.3);
+  --p-bg-grid-dark: rgba(0, 212, 255, 0.018);
+  --p-bg-dot-dark: rgba(0, 212, 255, 0.05);
+  --p-bg-node-dark: rgba(0, 212, 255, 0.16);
+  --p-bg-grid-light: rgba(0, 100, 200, 0.03);
+  --p-bg-dot-light: rgba(0, 100, 200, 0.07);
+  --p-bg-node-light: rgba(0, 100, 200, 0.16);
+  --p-bg-grid-step: 60px;
+  --p-bg-text-light: #365a80;
+  --p-bg-text-dark: #a7b5c9;
+}
+
+/* Capa 2: semantic (claro por defecto) */
+:root {
+  --bg-base: var(--p-bg-base-light);
+  --bg-glow-a: var(--p-bg-glow-green-light);
+  --bg-glow-b: var(--p-bg-glow-cyan-light);
+  --bg-glow-c: var(--p-bg-glow-teal-light);
+  --bg-glow-d: var(--p-bg-glow-emerald-light);
+  --bg-grid: var(--p-bg-grid-light);
+  --bg-dot: var(--p-bg-dot-light);
+  --bg-node: var(--p-bg-node-light);
+  /* Texto atenuado directamente sobre el fondo: mas oscuro que text-muted (4,5:1 en el peor punto) */
+  --bg-text-muted: var(--p-bg-text-light);
+}
+
+/* Capa 2: semantic (oscuro) */
+[data-theme='dark'] {
+  --bg-base: var(--p-bg-base-dark);
+  --bg-glow-a: var(--p-bg-glow-green-dark);
+  --bg-glow-b: var(--p-bg-glow-cyan-dark);
+  --bg-glow-c: var(--p-bg-glow-teal-dark);
+  --bg-glow-d: var(--p-bg-glow-emerald-dark);
+  --bg-grid: var(--p-bg-grid-dark);
+  --bg-dot: var(--p-bg-dot-dark);
+  --bg-node: var(--p-bg-node-dark);
+  --bg-text-muted: var(--p-bg-text-dark);
+}
+
+/* Capa 3: component (fondo compuesto; capas de arriba hacia abajo) */
+:root {
+  --bg-glow-a-soft: color-mix(in srgb, var(--bg-glow-a) 50%, transparent);
+  --bg-glow-b-soft: color-mix(in srgb, var(--bg-glow-b) 50%, transparent);
+  --bg-glow-c-soft: color-mix(in srgb, var(--bg-glow-c) 50%, transparent);
+  --bg-glow-d-soft: color-mix(in srgb, var(--bg-glow-d) 50%, transparent);
+  --bg-backdrop:
+    radial-gradient(circle 4px at 9% 16%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 23% 62%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 31% 9%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 38% 84%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 47% 37%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 55% 71%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 64% 12%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 72% 55%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 81% 27%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 88% 78%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 94% 44%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 4px at 4% 90%, var(--bg-node) 0, var(--bg-node) 1.5px, transparent 4px),
+    radial-gradient(circle 2px at 50% 50%, var(--bg-dot) 0, var(--bg-dot) 1px, transparent 2px)
+      calc(var(--p-bg-grid-step) / -2) calc(var(--p-bg-grid-step) / -2) / var(--p-bg-grid-step)
+      var(--p-bg-grid-step),
+    linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0 / var(--p-bg-grid-step)
+      var(--p-bg-grid-step),
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0 / var(--p-bg-grid-step)
+      var(--p-bg-grid-step),
+    radial-gradient(circle min(24rem, 55vw) at 72% 30%, var(--bg-glow-a), var(--bg-glow-a-soft) 50%, transparent),
+    radial-gradient(circle min(19rem, 45vw) at 62% 56%, var(--bg-glow-b), var(--bg-glow-b-soft) 50%, transparent),
+    radial-gradient(circle min(16rem, 40vw) at 82% 62%, var(--bg-glow-c), var(--bg-glow-c-soft) 50%, transparent),
+    radial-gradient(circle min(14rem, 36vw) at 56% 34%, var(--bg-glow-d), var(--bg-glow-d-soft) 50%, transparent),
+    radial-gradient(circle min(20rem, 50vw) at 12% 88%, var(--bg-glow-b), var(--bg-glow-b-soft) 50%, transparent),
+    radial-gradient(circle min(16rem, 40vw) at 6% 18%, var(--bg-glow-c), var(--bg-glow-c-soft) 50%, transparent),
+    var(--bg-base);
+}

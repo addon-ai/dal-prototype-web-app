@@ -57,6 +57,12 @@ de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (
   "Precios ilustrativos", los avisos de "no es una oferta" y la marca "(ejemplo)" de la empresa ficticia.
 - **Contraste del efecto cristal**: alfas mínimos de superficie medidos con WCAG (>= 4.5:1) sobre el peor
   fondo (orbes apilados y contenido saturado al 30 % detrás): claro 4,59-4,75; oscuro 4,54-4,72.
+- **Fondo de la app**: replica el fondo de la landing de Addon AI (azul noche `#050a14` / gris hielo `#f0f4f8`,
+  resplandores verde-cian-teal, rejilla de 60 px con puntos y nodos dispersos). Es estático (sin animación ni
+  desenfoque). Tokens `--bg-*` en `css/tokens.css` (3 capas) y capa fija en `css/backdrop.css`; aplica a acceso,
+  Agentes y Resultados. El Constructor conserva su lienzo. El claro deriva la variante que la landing no trae
+  (mismos tonos de marca, resplandores en tintes más claros). Contraste medido en el peor píxel renderizado
+  (1920/1440/375): texto sobre el fondo >= 4,57:1 claro y >= 5,47:1 oscuro; sobre cristal >= 4,71:1.
 - **Ajustes del paso contraíbles**: el panel derecho se contrae a un riel (botón con `aria-expanded`;
   Escape lo contrae; se abre solo al seleccionar un paso). Estado opcional en `dal-proto-inspector`.
 
