@@ -251,7 +251,9 @@
 /* Inspector: columna derecha (laptop), panel lateral (tablet) u hoja inferior (movil) */
 .inspector {
   z-index: 40;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: var(--panel-bg);
   border-block-start: var(--border-width) solid var(--panel-border);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;

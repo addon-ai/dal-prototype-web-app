@@ -1,0 +1,107 @@
+/* Panel de ajustes contraible (como la paleta) y chevron de la receta tecnica. Solo tokens. */
+
+.inspector__bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3) 0 var(--space-4);
+  border-block-end: var(--border-width) solid var(--color-border-light);
+}
+
+.inspector__bar-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.inspector__panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Movil: hoja inferior; contraida queda solo la barra */
+.inspector__toggle .icon {
+  transform: rotate(90deg);
+  transition: transform var(--transition-fast);
+}
+
+.view[data-inspector='collapsed'] .inspector__toggle .icon {
+  transform: rotate(-90deg);
+}
+
+.view[data-inspector='collapsed'] .inspector__panel {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .inspector {
+    transition:
+      transform var(--transition-panel),
+      width var(--transition-panel);
+  }
+
+  .inspector__toggle .icon {
+    transform: none;
+  }
+
+  .view[data-inspector='collapsed'] .inspector__toggle .icon {
+    transform: rotate(180deg);
+  }
+
+  /* Riel angosto con icono, como la paleta contraida */
+  .view[data-inspector='collapsed'] .inspector {
+    width: var(--palette-width-collapsed);
+  }
+
+  .view[data-inspector='collapsed'] .inspector__bar {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: var(--space-2) 0;
+    border-block-end: 0;
+  }
+
+  .view[data-inspector='collapsed'] .inspector__bar-title {
+    writing-mode: vertical-rl;
+    color: var(--color-text-secondary);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1599px) {
+  .view[data-selection='true'][data-inspector='collapsed'] .minimap {
+    inset-inline-end: calc(var(--palette-width-collapsed) + var(--space-4));
+  }
+}
+
+@media (min-width: 1600px) {
+  .view--builder[data-inspector='collapsed'] {
+    grid-template-columns: var(--palette-width) minmax(0, 1fr) var(--palette-width-collapsed);
+  }
+
+  .view--builder[data-inspector='collapsed'][data-palette='collapsed'] {
+    grid-template-columns:
+      var(--palette-width-collapsed) minmax(0, 1fr)
+      var(--palette-width-collapsed);
+  }
+}
+
+/* Receta tecnica: la barra entera es el boton; el chevron rota segun el estado */
+.recipe > summary {
+  gap: var(--space-2);
+  list-style: none;
+}
+
+.recipe > summary::-webkit-details-marker {
+  display: none;
+}
+
+.recipe__chevron {
+  margin-inline-start: auto;
+  transition: transform var(--transition-fast);
+}
+
+.recipe[open] .recipe__chevron {
+  transform: rotate(180deg);
+}

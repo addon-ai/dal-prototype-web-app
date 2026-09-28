@@ -11,16 +11,21 @@
     <title>Asistente de envíos</title>
     <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <script>
-      /* Anti-FOUC: aplica el tema guardado antes del primer pintado. */
+      /* Anti-FOUC: aplica el tema y el efecto cristal guardados antes del primer pintado. */
       (function () {
+        var root = document.documentElement;
+        var glass = 'on';
         try {
-          var saved = window.localStorage.getItem('dal-proto-theme');
-          if (saved === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
+          if (window.localStorage.getItem('dal-proto-theme') === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+          }
+          if (window.localStorage.getItem('dal-proto-glass') === 'off') {
+            glass = 'off';
           }
         } catch (error) {
-          /* localStorage no disponible: se queda el tema claro. */
+          /* localStorage no disponible: tema claro y cristal activado. */
         }
+        root.setAttribute('data-glass', glass);
       })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,8 +41,55 @@
     <link rel="stylesheet" href="./css/builder.css" />
     <link rel="stylesheet" href="./css/palette.css" />
     <link rel="stylesheet" href="./css/panels.css" />
+    <link rel="stylesheet" href="./css/collapse.css" />
+    <link rel="stylesheet" href="./css/glass.css" />
+    <link rel="stylesheet" href="./css/login.css" />
   </head>
   <body>
+    <div
+      id="live"
+      class="visually-hidden"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+
+    <section id="login" class="login" aria-labelledby="login-title">
+      <span class="login__orb login__orb--a" aria-hidden="true"></span>
+      <span class="login__orb login__orb--b" aria-hidden="true"></span>
+      <span class="login__orb login__orb--c" aria-hidden="true"></span>
+      <div class="login__card">
+        <img class="login__logo login__logo--light" src="./assets/logo-sidebar.svg" alt="Addon AI" />
+        <img
+          class="login__logo login__logo--dark"
+          src="./assets/logo-sidebar-dark.svg"
+          alt="Addon AI"
+        />
+        <h1 id="login-title" class="login__title" tabindex="-1">
+          Bienvenido a tu asistente de envíos
+        </h1>
+        <p class="login__subtitle">
+          Diseña y prueba cómo atiende tu equipo las consultas y reclamos de clientes.
+        </p>
+        <form id="login-form" class="login__form" novalidate>
+          <div class="login__field">
+            <label for="login-email">Correo electrónico</label>
+            <input id="login-email" type="email" autocomplete="email" inputmode="email" />
+          </div>
+          <div class="login__field">
+            <label for="login-password">Contraseña</label>
+            <input id="login-password" type="password" autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn btn--primary login__submit">Iniciar sesión</button>
+          <a class="login__link" href="#login-title" id="login-forgot">¿Olvidaste tu contraseña?</a>
+        </form>
+        <p class="login__note">
+          Acceso de demostración: no se solicita ni guarda ninguna credencial.
+        </p>
+      </div>
+    </section>
+
+    <div id="app-shell" class="app-shell" inert>
     <a class="skip-link" href="#main">Saltar al contenido</a>
 
     <header class="topbar">
@@ -90,17 +142,34 @@
           <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
         </svg>
       </button>
+
+      <button
+        type="button"
+        id="glass-toggle"
+        class="btn btn--icon glass-toggle"
+        aria-pressed="true"
+        aria-label="Efecto cristal"
+        title="Efecto cristal"
+      >
+        <svg class="icon icon--glass-on" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z" />
+          <path d="M9.5 14.5a2.5 2.5 0 0 0 2 2.4" />
+        </svg>
+        <svg class="icon icon--glass-off" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z" />
+          <path d="M4 4l16 16" />
+        </svg>
+      </button>
+
+      <button type="button" id="logout" class="btn btn--ghost logout-btn" aria-label="Cerrar sesión">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M16 8l4 4-4 4M20 12H9" />
+        </svg>
+        <span class="logout-btn__text">Cerrar sesión</span>
+      </button>
     </header>
 
     <main id="main" class="app-main">
-      <div
-        id="live"
-        class="visually-hidden"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      ></div>
-
       <section
         id="view-constructor"
         class="view view--builder"
@@ -142,12 +211,35 @@
           <div id="canvas-wrap" class="canvas-wrap"></div>
 
           <details id="recipe" class="recipe">
-            <summary>Receta técnica (para TI)</summary>
+            <summary>
+              <span>Receta técnica (para TI)</span>
+              <svg class="icon recipe__chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </summary>
             <div id="recipe-body" class="recipe__body"></div>
           </details>
         </div>
 
-        <aside id="inspector" class="inspector" aria-label="Ajustes del paso"></aside>
+        <aside id="inspector" class="inspector" aria-label="Ajustes del paso">
+          <div class="inspector__bar">
+            <span class="inspector__bar-title">Ajustes</span>
+            <button
+              type="button"
+              id="inspector-toggle"
+              class="btn btn--icon btn--ghost inspector__toggle"
+              aria-expanded="true"
+              aria-controls="inspector-panel"
+              aria-label="Contraer los ajustes del paso"
+              title="Contraer los ajustes del paso"
+            >
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </button>
+          </div>
+          <div id="inspector-panel" class="inspector__panel"></div>
+        </aside>
       </section>
 
       <section id="view-resultados" class="view view--page" aria-labelledby="resultados-title" hidden>
@@ -160,6 +252,7 @@
         <div id="narrative"></div>
       </section>
     </main>
+    </div>
 
     <script type="module" src="./js/main.js"></script>
   </body>

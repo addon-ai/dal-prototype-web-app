@@ -1,5 +1,7 @@
 // Composition root: ensambla store, lienzo, paneles, vistas, borrador y tema.
 import './ui/theme.js';
+import { initGlassToggle } from './ui/glass-toggle.js';
+import { mountLogin } from './ui/login.js';
 import { createStore } from './store.js';
 import { reducer, createInitialState } from './reducer.js';
 import { CATALOG } from './data/catalog.js';
@@ -18,6 +20,7 @@ import { mountSimulation } from './canvas/simulate.js';
 import { fitToScreen, initialFit } from './canvas/view-actions.js';
 import { mountPalette } from './ui/palette.js';
 import { mountInspector } from './ui/inspector.js';
+import { mountInspectorToggle } from './ui/inspector-toggle.js';
 import { mountLive } from './ui/live.js';
 import { mountRecipe } from './ui/recipe.js';
 import { mountStats } from './ui/stats.js';
@@ -92,7 +95,13 @@ function restoreTemplate() {
   store.dispatch({ type: 'LOAD_TEMPLATE' });
   fitToScreen(store, svg);
 }
-mountInspector(document.getElementById('inspector'), store);
+mountInspector(document.getElementById('inspector-panel'), store);
+mountInspectorToggle({
+  view: document.getElementById('view-constructor'),
+  inspector: document.getElementById('inspector'),
+  toggle: document.getElementById('inspector-toggle'),
+  store,
+});
 mountLive(document.getElementById('live'), store);
 mountRecipe(document.getElementById('recipe'), document.getElementById('recipe-body'), store);
 mountStats(document.getElementById('stats'), store, getModel);
@@ -138,3 +147,13 @@ store.subscribe(
     draftTimer = setTimeout(() => setDraft(graph), DRAFT_DELAY_MS);
   },
 );
+
+// Efecto cristal y sesion de demostracion (el login se muestra en cada carga).
+initGlassToggle(document.getElementById('glass-toggle'));
+mountLogin({
+  login: document.getElementById('login'),
+  shell: document.getElementById('app-shell'),
+  form: document.getElementById('login-form'),
+  logoutButton: document.getElementById('logout'),
+  store,
+});

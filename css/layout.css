@@ -60,8 +60,24 @@ body {
     height: var(--logo-height);
   }
 
+  /* Dos filas: marca + acciones arriba, secciones abajo (caben en 375px) */
   .topbar {
+    flex-wrap: wrap;
     gap: var(--space-1);
+  }
+
+  .brand {
+    margin-inline-end: auto;
+  }
+
+  .main-nav {
+    order: 3;
+    flex: 1 1 100%;
+    margin-inline-end: 0;
+  }
+
+  .main-nav__list {
+    justify-content: space-between;
   }
 
   .topbar .main-nav__btn {

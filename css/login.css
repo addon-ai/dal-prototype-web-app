@@ -1,0 +1,200 @@
+/* Pantalla de acceso de demostracion + cierre de sesion. Solo tokens. */
+
+.app-shell {
+  display: contents;
+}
+
+.login {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: var(--space-6) var(--space-4);
+  background: var(--color-bg-page);
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
+}
+
+[data-glass='on'] .login {
+  background: var(--glass-page-bg);
+}
+
+.login--leaving {
+  opacity: 0;
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+/* Orbes difusos: solo con cristal activado; dan color al desenfoque de la tarjeta */
+.login__orb {
+  display: none;
+  position: absolute;
+  width: 46vmax;
+  height: 46vmax;
+  border-radius: var(--radius-full);
+  pointer-events: none;
+  animation: login-drift 28s ease-in-out infinite alternate;
+}
+
+[data-glass='on'] .login__orb {
+  display: block;
+}
+
+.login__orb--a {
+  inset-block-start: 4vmax;
+  inset-inline-start: calc(50% - 40vmax);
+  background: radial-gradient(circle, var(--glass-orb-a), transparent 68%);
+}
+
+.login__orb--b {
+  inset-block-end: 2vmax;
+  inset-inline-end: calc(50% - 34vmax);
+  background: radial-gradient(circle, var(--glass-orb-b), transparent 68%);
+  animation-duration: 34s;
+  animation-direction: alternate-reverse;
+}
+
+.login__orb--c {
+  inset-block-start: 10%;
+  inset-inline-start: calc(50% - 8vmax);
+  width: 34vmax;
+  height: 34vmax;
+  background: radial-gradient(circle, var(--glass-orb-c), transparent 68%);
+  animation-duration: 40s;
+}
+
+@keyframes login-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(4vmax, 3vmax, 0) scale(1.08);
+  }
+}
+
+.login__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-8) var(--space-6);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-bg-card);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+[data-glass='on'] .login__card {
+  background-color: var(--glass-login-bg);
+  box-shadow: var(--glass-shadow), var(--glass-ring);
+}
+
+.login__logo {
+  width: auto;
+  height: var(--space-10);
+  margin-block-end: var(--space-5);
+}
+
+.login__logo--dark,
+[data-theme='dark'] .login__logo--light {
+  display: none;
+}
+
+[data-theme='dark'] .login__logo--dark {
+  display: block;
+}
+
+.login__subtitle {
+  margin-block: var(--space-1) var(--space-6);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.login__form {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+  text-align: start;
+}
+
+.login__field {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.login__field label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.login__field input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border-control);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+}
+
+[data-glass='on'] .login__field input {
+  background-color: var(--glass-control-bg);
+}
+
+.login__submit {
+  width: 100%;
+  margin-block-start: var(--space-2);
+}
+
+.login__link {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  font-size: var(--font-size-sm);
+}
+
+.login__note {
+  margin-block-start: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+/* Cerrar sesion: texto visible desde tablet; en movil solo el icono */
+.logout-btn__text {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .logout-btn__text {
+    display: inline;
+  }
+}
+
+@media (max-width: 767px) {
+  .login {
+    align-items: start;
+    padding-block-start: var(--space-8);
+  }
+
+  .login__card {
+    padding-inline: var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login {
+    transition: none;
+  }
+
+  .login__orb {
+    animation: none;
+  }
+}

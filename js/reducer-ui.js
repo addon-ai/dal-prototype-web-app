@@ -65,6 +65,7 @@ function simStop(state, { silent } = {}) {
 }
 
 export const UI_HANDLERS = {
+  SET_NOTICE: (state, { text }) => withNotice(state, text),
   SET_VIEWPORT: setViewport,
   SIM_START: simStart,
   SIM_STEP: simStep,

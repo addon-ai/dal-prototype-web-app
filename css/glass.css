@@ -1,0 +1,136 @@
+/* Efecto cristal (Liquid Glass): solo actua con <html data-glass='on'>. Solo tokens --glass-*.
+   Con data-glass='off' (o sin soporte de backdrop-filter, o con reduced-transparency) la app
+   conserva el estilo solido. El desenfoque se aplica a pocas superficies (nunca a cada nodo SVG). */
+
+/* Fondo de la app: gradiente con orbes difusos que hacen visible el desenfoque */
+[data-glass='on'] body {
+  background: var(--glass-page-bg);
+  background-attachment: fixed;
+}
+
+/* Los contenedores del lienzo dejan ver el fondo */
+[data-glass='on'] {
+  --canvas-bg: transparent;
+  --node-bg: var(--glass-node-bg);
+  --node-badge-bg: var(--glass-node-bg);
+  --canvas-edge-label-bg: var(--glass-node-bg);
+}
+
+/* Superficies con vidrio: barra, paneles, flotantes, tarjetas y chips */
+[data-glass='on'] :is(.topbar, .stage__bar, .recipe, .palette, .inspector, .float, .minimap, .kpi, .panel, .tag, .login__card) {
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  background-image: var(--glass-sheen);
+  border-color: var(--glass-edge);
+}
+
+[data-glass='on'] :is(.topbar, .stage__bar, .recipe) {
+  background-color: var(--glass-bar-bg);
+}
+
+[data-glass='on'] :is(.palette, .inspector) {
+  --panel-bg: var(--glass-panel-bg);
+  --panel-border: var(--glass-edge);
+  background-color: var(--glass-panel-bg);
+}
+
+[data-glass='on'] :is(.float, .minimap) {
+  --float-border: var(--glass-border);
+  background-color: var(--glass-float-bg);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-ring);
+}
+
+/* El minimapa no lleva texto: puede ser mas translucido */
+[data-glass='on'] .minimap {
+  background-color: var(--glass-minimap-bg);
+}
+
+[data-glass='on'] :is(.kpi, .panel) {
+  background-color: var(--glass-card-bg);
+  box-shadow: var(--glass-shadow-soft), var(--glass-ring);
+}
+
+[data-glass='on'] .kpi:hover {
+  box-shadow: var(--glass-shadow), var(--glass-ring);
+}
+
+[data-glass='on'] .tag {
+  background-color: var(--glass-chip-bg);
+  box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-specular);
+}
+
+[data-glass='on'] .topbar {
+  box-shadow: var(--glass-shadow-soft), inset 0 -1px 0 var(--glass-specular);
+}
+
+[data-glass='on'] :is(.stage__bar, .recipe) {
+  box-shadow: inset 0 1px 0 var(--glass-specular);
+}
+
+[data-glass='on'] :is(.palette, .inspector) {
+  box-shadow: var(--glass-shadow-soft), inset 0 1px 0 var(--glass-specular);
+}
+
+/* Elementos internos: cristal ligero sin desenfoque propio */
+[data-glass='on'] :is(.inspector__head, .btn:not(.btn--primary, .btn--ghost), .palette__input, .field input:not([type='range']), .field select, .select, .palette-item) {
+  background-color: var(--glass-control-bg);
+}
+
+[data-glass='on'] .inspector__head {
+  background-color: var(--glass-panel-bg);
+}
+
+[data-glass='on'] .btn--primary {
+  box-shadow: inset 0 1px 0 var(--glass-specular), var(--glass-shadow-soft);
+}
+
+/* Nodos: toque de vidrio con borde especular; el texto conserva el contraste del token de nodo */
+[data-glass='on'] .node__card {
+  stroke: var(--glass-edge);
+}
+
+/* Interruptor "Efecto cristal" */
+.glass-toggle .icon--glass-off {
+  display: none;
+}
+
+[data-glass='off'] .glass-toggle .icon--glass-on {
+  display: none;
+}
+
+[data-glass='off'] .glass-toggle .icon--glass-off {
+  display: block;
+}
+
+/* Sin soporte de backdrop-filter: fondo solido */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-glass='on'] {
+    --glass-filter: none;
+    --glass-page-bg: var(--color-bg-page);
+    --glass-sheen: none;
+    --glass-surface-strong: var(--color-bg-card);
+    --glass-surface: var(--color-bg-card);
+    --glass-surface-light: var(--color-bg-card);
+    --glass-surface-airy: var(--color-bg-card);
+    --glass-node: var(--color-bg-card);
+    --glass-edge: var(--color-border);
+    --glass-border: var(--color-border);
+  }
+}
+
+/* Transparencia reducida: superficies opacas, sin desenfoque */
+@media (prefers-reduced-transparency: reduce) {
+  [data-glass='on'] {
+    --glass-filter: none;
+    --glass-page-bg: var(--color-bg-page);
+    --glass-sheen: none;
+    --glass-surface-strong: var(--color-bg-card);
+    --glass-surface: var(--color-bg-card);
+    --glass-surface-light: var(--color-bg-card);
+    --glass-surface-airy: var(--color-bg-card);
+    --glass-node: var(--color-bg-card);
+    --glass-edge: var(--color-border);
+    --glass-border: var(--color-border);
+  }
+}

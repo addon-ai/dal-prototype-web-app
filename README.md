@@ -24,6 +24,21 @@ El inspector es una tercera columna desde 1600 px, un panel lateral flotante ent
 una hoja inferior en movil. El zoom/paneo y la simulacion viven en `ui` del store y no forman parte
 de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (ver su cabecera).
 
+## Acceso de demostración y efecto cristal
+
+- **Inicio de sesión (mock)**: en cada carga se muestra primero una pantalla de acceso. "Iniciar sesión"
+  (o Enter) entra SIEMPRE al Constructor, sin validar nada y aceptando campos vacíos. No se envía, guarda
+  ni registra ninguna credencial (los campos se vacían al enviar). "Cerrar sesión" (barra superior) vuelve
+  al acceso. Mientras está visible, el resto de la app queda `inert`.
+- **Efecto cristal (Liquid Glass)**: activado por defecto; el botón de la barra superior lo alterna
+  (`data-glass="on|off"` en `<html>`, preferencia opcional en localStorage `dal-proto-glass`). Tokens
+  `--glass-*` en `css/tokens.css` (3 capas) y reglas en `css/glass.css`. Con `off`, sin soporte de
+  `backdrop-filter` o con `prefers-reduced-transparency`, las superficies son sólidas.
+- **Contraste del efecto cristal**: alfas mínimos de superficie medidos con WCAG (>= 4.5:1) sobre el peor
+  fondo (orbes apilados y contenido saturado al 30 % detrás): claro 4,59-4,75; oscuro 4,54-4,72.
+- **Ajustes del paso contraíbles**: el panel derecho se contrae a un riel (botón con `aria-expanded`;
+  Escape lo contrae; se abre solo al seleccionar un paso). Estado opcional en `dal-proto-inspector`.
+
 ## Abrirlo en local
 
 ```bash
