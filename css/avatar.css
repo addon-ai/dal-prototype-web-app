@@ -1,0 +1,134 @@
+/* Avatares de agente (SVG en linea). El anillo de estado combina color, trazo (solido, guiones,
+   puntos) y un glifo, para que el estado no dependa solo del color. Solo tokens. */
+
+.agent-avatar {
+  --avatar-size: 40px;
+  --ring: transparent;
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: var(--radius-full);
+  line-height: 0;
+}
+
+.agent-avatar__art {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-md);
+}
+
+.agent-avatar[data-status] {
+  outline: var(--stroke-bold) solid var(--ring);
+  outline-offset: var(--stroke-base);
+}
+
+.agent-avatar[data-status='ok'] {
+  --ring: var(--color-status-ok);
+}
+
+.agent-avatar[data-status='draft'] {
+  --ring: var(--color-status-warn);
+  outline-style: dashed;
+}
+
+.agent-avatar[data-status='review'] {
+  --ring: var(--color-status-info);
+  outline-style: dotted;
+}
+
+.agent-avatar__status {
+  position: absolute;
+  inset-block-start: calc(var(--space-1) * -1);
+  inset-inline-end: calc(var(--space-1) * -1);
+  display: grid;
+  place-items: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  border: var(--stroke-base) solid var(--ring);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-card);
+  color: var(--ring);
+}
+
+.agent-avatar__status .icon {
+  width: var(--space-3);
+  height: var(--space-3);
+  stroke-width: 3;
+}
+
+/* Titulo con avatar (constructor y resultados) */
+.agent-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.agent-title__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#resultados-title.agent-title {
+  white-space: normal;
+}
+
+#resultados-title .agent-title__name {
+  overflow: visible;
+  overflow-wrap: anywhere;
+}
+
+/* Selector de avatar */
+.avatar-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));
+  gap: var(--space-2);
+}
+
+.avatar-picker__opt {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: var(--tap-min);
+  min-height: 3.5rem;
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-bg-raised);
+}
+
+.avatar-picker__opt:hover {
+  border-color: var(--color-border-control);
+}
+
+.avatar-picker__opt[aria-checked='true'] {
+  border: var(--stroke-bold) solid var(--color-text-primary);
+  background: var(--color-accent-soft);
+}
+
+.avatar-picker__mark {
+  position: absolute;
+  inset-block-start: calc(var(--space-1) * -1);
+  inset-inline-end: calc(var(--space-1) * -1);
+  display: none;
+  place-items: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  border-radius: var(--radius-full);
+  background: var(--color-text-primary);
+  color: var(--color-bg-card);
+}
+
+.avatar-picker__opt[aria-checked='true'] .avatar-picker__mark {
+  display: grid;
+}
+
+.avatar-picker__mark .icon {
+  width: var(--space-3);
+  height: var(--space-3);
+  stroke-width: 3;
+}

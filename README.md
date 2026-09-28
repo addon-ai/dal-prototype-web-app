@@ -30,6 +30,11 @@ de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (
 - **Agentes** (`#/agentes`): colección mock de 7 agentes de logística (`js/data/agents/`), con filtros
   Todos/Míos/De mi organización, búsqueda, orden y tarjeta "Nuevo agente". Cada agente tiene su grafo,
   receta, resultados y costos; el borrador se guarda por agente (`dal-proto-draft-v2:<id>`).
+- **Avatares**: 14 avatares SVG en línea (`js/data/avatars.js`, dibujo en `js/ui/avatar.js`), sin imágenes
+  externas. Se editan junto al nombre con el botón «Editar» del constructor (diálogo accesible).
+- **Constructor = agente nuevo**: la pestaña «Constructor» crea un agente en blanco («Agente nuevo N»).
+  Los agentes creados y los cambios de nombre/avatar se guardan en `dal-proto-agents-v1` (localStorage,
+  opcional); los creados se pueden eliminar con confirmación.
 - **Rutas por hash**: `#/agentes`, `#/constructor/:id`, `#/resultados/:id` (solo hash, sin red).
 - **Cuenta**: el avatar de la barra abre un panel con usuario y empresa de ejemplo, tema, cristal y
   "Cerrar sesión".

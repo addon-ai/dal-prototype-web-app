@@ -23,7 +23,8 @@ export function openAgentById(store, id) {
     return false;
   }
   const draft = getDraft(id);
-  const graph = isValidDraft(draft) ? draft : cloneAgentGraph(id);
+  const saved = isValidDraft(draft) ? draft : cloneAgentGraph(id);
+  const graph = { ...saved, name: agent.name }; // el nombre vigente manda sobre el del borrador
   store.dispatch({ type: 'OPEN_AGENT', id, graph, casosMes: agent.casos });
   return true;
 }
@@ -60,12 +61,12 @@ export function mountHashSync(store, isSignedIn) {
     }
   };
   store.subscribe((s) => `${s.ui.view}|${s.ui.agentId}`, write);
-  return write;
   window.addEventListener('hashchange', () => {
     if (isSignedIn()) {
       goTo(store, parseHash(window.location.hash));
     }
   });
+  return write;
 }
 
 export function clearHash() {

@@ -1,7 +1,7 @@
 // Vistas de la app: una visible a la vez; al navegar el foco pasa al encabezado principal.
 import { VIEWS, guardView } from './navigation.js';
 
-export function mountViews(store) {
+export function mountViews(store, onNewAgent) {
   const navButtons = Array.from(document.querySelectorAll('.main-nav [data-view]'));
 
   function focusHeading() {
@@ -25,7 +25,14 @@ export function mountViews(store) {
   }
 
   navButtons.forEach((button) => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', (event) => {
+      if (button.dataset.view === 'constructor') {
+        // "Constructor" siempre inicia un agente nuevo; un doble clic no crea dos.
+        if (event.detail < 2) {
+          onNewAgent();
+        }
+        return;
+      }
       if (guardView(store, button.dataset.view)) {
         store.dispatch({ type: 'SET_VIEW', view: button.dataset.view });
       }

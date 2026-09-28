@@ -43,6 +43,8 @@
     <link rel="stylesheet" href="./css/panels.css" />
     <link rel="stylesheet" href="./css/collapse.css" />
     <link rel="stylesheet" href="./css/agents.css" />
+    <link rel="stylesheet" href="./css/avatar.css" />
+    <link rel="stylesheet" href="./css/modal.css" />
     <link rel="stylesheet" href="./css/glass.css" />
     <link rel="stylesheet" href="./css/login.css" />
   </head>
@@ -181,7 +183,15 @@
               Agentes
             </button>
             <div class="stage__title">
-              <h1 id="constructor-title" tabindex="-1">Asistente de seguimiento de envíos</h1>
+              <div class="agent-head">
+                <h1 id="constructor-title" class="agent-title" tabindex="-1">Asistente de seguimiento de envíos</h1>
+                <button type="button" id="agent-edit" class="btn agent-head__edit" aria-haspopup="dialog">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 20h4L19 9l-4-4L4 16z" />
+                  </svg>
+                  <span class="agent-head__edit-text">Editar</span>
+                </button>
+              </div>
               <p class="tag stage__scenario" id="scenario-tag">
                 Empresa y proceso de ejemplo: a definir en sesión 2
               </p>
@@ -228,7 +238,7 @@
       </section>
 
       <section id="view-resultados" class="view view--page" aria-labelledby="resultados-title" hidden>
-        <h1 id="resultados-title" tabindex="-1">Resultados y costos</h1>
+        <h1 id="resultados-title" class="agent-title" tabindex="-1">Resultados y costos</h1>
         <div id="stats"></div>
         <div id="costs"></div>
       </section>

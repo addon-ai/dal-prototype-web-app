@@ -1,44 +1,71 @@
-// Coleccion mock de agentes de la empresa de ejemplo. Sin red; cada agente tiene su propio grafo.
+// Coleccion de agentes: los 7 mock (con sus cambios de nombre/avatar) y los creados por el usuario.
+// Sin red. Los creados y los cambios sobre los mock se guardan en localStorage si esta disponible.
 import { cloneTemplateGraph } from '../template-logistica.js';
-import { RECLAMOS, COTIZACION, CONCILIACION } from './logistica-a.js';
-import { CITAS, ALERTAS, ADUANA } from './logistica-b.js';
+import { pickAvatarId, getAvatar } from '../avatars.js';
+import { loadAgentsState, saveAgentsState } from '../../agents-storage.js';
+import { ME } from './owner.js';
+import { SEED } from './seed.js';
 
-export const ME = 'Camila Rojas';
+export { ME };
 
-// owner: nombre del propietario; scope: 'personal' | 'organizacion'; edited: dias desde la ultima edicion
-function meta(id, name, description, status, owner, scope, edited, casos, auto, graph) {
-  return { id, name, description, status, owner, scope, edited, casos, auto, graph };
+const NAME_MAX = 60;
+
+function baseGraph(id, name, fromTemplate) {
+  return fromTemplate
+    ? { ...cloneTemplateGraph(), id, name }
+    : { id, name, version: '1.0.0', nodes: [], edges: [] };
 }
 
-const SEED = [
-  meta('seguimiento-envios', 'Asistente de seguimiento de envíos',
-    'Responde dónde está cada envío y atiende los retrasos con el criterio de la empresa.',
-    'activo', ME, 'organizacion', 1, 3000, 82, cloneTemplateGraph()),
-  meta('atencion-reclamos', 'Atención de reclamos',
-    'Recibe reclamos de clientes, revisa el envío y propone la compensación correcta.',
-    'activo', 'Andrés Salazar', 'organizacion', 3, 1200, 64, RECLAMOS),
-  meta('cotizacion-fletes', 'Cotización de fletes',
-    'Convierte una solicitud de transporte en una cotización clara en minutos.',
-    'en-revision', ME, 'personal', 5, 900, 71, COTIZACION),
-  meta('conciliacion-facturas', 'Conciliación de facturas de transporte',
-    'Compara las facturas de los transportistas con las guías y señala diferencias.',
-    'borrador', 'Laura Mejía', 'organizacion', 9, 2400, 58, CONCILIACION),
-  meta('citas-descarga', 'Programación de citas de descarga',
-    'Coordina con los transportistas el horario de llegada a cada muelle.',
-    'activo', 'Julián Correa', 'organizacion', 2, 1500, 76, CITAS),
-  meta('alertas-retrasos', 'Alertas de retrasos a clientes',
-    'Avisa a los clientes antes de que pregunten cuando un envío se atrasa.',
-    'borrador', ME, 'personal', 0, 4200, 88, ALERTAS),
-  meta('verificacion-aduanera', 'Verificación de documentos aduaneros',
-    'Revisa que los documentos de exportación estén completos antes de radicarlos.',
-    'en-revision', 'Laura Mejía', 'organizacion', 14, 600, 49, ADUANA),
-];
+function describe(fromTemplate) {
+  return fromTemplate
+    ? 'Copia de la plantilla de seguimiento de envíos para ajustar a tu caso.'
+    : 'Agente en blanco: agrega pasos desde la paleta para empezar.';
+}
 
-let sequence = 0;
-const created = [];
+function hydrate(card) {
+  const avatarId = getAvatar(card.avatarId) ? card.avatarId : pickAvatarId(card.id);
+  return {
+    id: card.id,
+    name: card.name.slice(0, NAME_MAX),
+    description: describe(card.fromTemplate),
+    status: 'borrador',
+    owner: ME,
+    scope: 'personal',
+    edited: 0,
+    casos: 1000,
+    auto: 0,
+    avatarId,
+    fromTemplate: card.fromTemplate,
+    user: true,
+    graph: baseGraph(card.id, card.name, card.fromTemplate),
+  };
+}
+
+const stored = loadAgentsState();
+let sequence = stored.seq;
+const overrides = { ...stored.overrides };
+const created = stored.created.map(hydrate);
+
+function persist() {
+  saveAgentsState({
+    seq: sequence,
+    overrides,
+    created: created.map(({ id, name, avatarId, fromTemplate }) => ({ id, name, avatarId, fromTemplate })),
+  });
+}
+
+function withOverride(agent) {
+  const patch = overrides[agent.id];
+  if (!patch) {
+    return agent;
+  }
+  const avatarId = getAvatar(patch.avatarId) ? patch.avatarId : agent.avatarId;
+  const name = typeof patch.name === 'string' && patch.name ? patch.name.slice(0, NAME_MAX) : agent.name;
+  return { ...agent, name, avatarId };
+}
 
 export function listAgents() {
-  return [...created, ...SEED];
+  return [...created, ...SEED.map(withOverride)];
 }
 
 export function getAgent(id) {
@@ -48,21 +75,42 @@ export function getAgent(id) {
 // Copia editable del grafo original del agente ("Restaurar plantilla").
 export function cloneAgentGraph(id) {
   const agent = getAgent(id);
-  return agent ? structuredClone(agent.graph) : null;
+  return agent ? { ...structuredClone(agent.graph), name: agent.name } : null;
 }
 
-// Agente nuevo de la sesion: en blanco o con la plantilla de seguimiento.
+// Agente nuevo: en blanco o con la plantilla de seguimiento. Nombre, id y avatar son deterministas.
 export function createAgent(fromTemplate) {
   sequence += 1;
   const id = `nuevo-${sequence}`;
-  const name = `Agente nuevo ${sequence}`;
-  const graph = fromTemplate
-    ? { ...cloneTemplateGraph(), id, name }
-    : { id, name, version: '1.0.0', nodes: [], edges: [] };
-  const description = fromTemplate
-    ? 'Copia de la plantilla de seguimiento de envíos para ajustar a tu caso.'
-    : 'Agente en blanco: agrega pasos desde la paleta para empezar.';
-  const agent = meta(id, name, description, 'borrador', ME, 'personal', 0, 1000, 0, graph);
+  const agent = hydrate({ id, name: `Agente nuevo ${sequence}`, fromTemplate: Boolean(fromTemplate) });
   created.unshift(agent);
+  persist();
   return agent;
+}
+
+// Cambia nombre y/o avatar (mock: queda como ajuste local; creados: se edita la ficha).
+export function updateAgent(id, { name, avatarId }) {
+  const own = created.find((agent) => agent.id === id);
+  const clean = (name ?? '').trim().slice(0, NAME_MAX);
+  if (own) {
+    own.name = clean || own.name;
+    own.avatarId = getAvatar(avatarId) ? avatarId : own.avatarId;
+  } else if (SEED.some((agent) => agent.id === id)) {
+    overrides[id] = { ...overrides[id], ...(clean ? { name: clean } : {}), ...(getAvatar(avatarId) ? { avatarId } : {}) };
+  } else {
+    return null;
+  }
+  persist();
+  return getAgent(id);
+}
+
+// Solo se eliminan los agentes creados por el usuario.
+export function deleteAgent(id) {
+  const index = created.findIndex((agent) => agent.id === id);
+  if (index < 0) {
+    return false;
+  }
+  created.splice(index, 1);
+  persist();
+  return true;
 }

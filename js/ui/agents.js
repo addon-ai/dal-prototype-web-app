@@ -1,7 +1,9 @@
 // Coleccion de agentes: saludo, filtros con conteos, busqueda, orden y cuadricula de tarjetas.
 import { h } from './dom.js';
 import { agentCard, newAgentCard } from './agents-card.js';
-import { listAgents, createAgent, ME } from '../data/agents/index.js';
+import { listAgents, deleteAgent, ME } from '../data/agents/index.js';
+import { clearDraft } from '../draft-storage.js';
+import { askConfirm } from './confirm-dialog.js';
 
 const FILTERS = [
   ['todos', 'Todos', () => true],
@@ -14,7 +16,7 @@ const SORTS = [
 ];
 const normalize = (text) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 
-export function mountAgents(view, store, openAgent) {
+export function mountAgents(view, store, openAgent, createNew) {
   const root = view.querySelector('#agents-root');
   const state = { filter: 'todos', query: '', sort: 'recientes' };
 
@@ -68,7 +70,7 @@ export function mountAgents(view, store, openAgent) {
       .filter((a) => !q || normalize(`${a.name} ${a.description}`).includes(q))
       .sort(order);
     paintFilters();
-    grid.replaceChildren(...shown.map((agent, i) => agentCard(agent, i, openAgent)));
+    grid.replaceChildren(...shown.map((agent) => agentCard(agent, openAgent, onDelete)));
     if (state.filter !== 'org') {
       grid.append(newAgentCard(onCreate));
     }
@@ -77,8 +79,22 @@ export function mountAgents(view, store, openAgent) {
       : 'No hay agentes con este filtro o búsqueda. Cambia el filtro o crea uno nuevo.';
   }
 
-  function onCreate(fromTemplate) {
-    openAgent(createAgent(fromTemplate).id);
+  const onCreate = (fromTemplate) => createNew(fromTemplate);
+
+  function onDelete(agent, trigger) {
+    askConfirm({
+      trigger,
+      title: `¿Eliminar «${agent.name}»?`,
+      text: 'Se borran el agente, su avatar y su borrador de este navegador. No se puede deshacer.',
+      confirmLabel: 'Eliminar agente',
+      fallbackFocus: () => view.querySelector('h1'),
+      onConfirm: () => {
+        deleteAgent(agent.id);
+        clearDraft(agent.id);
+        store.dispatch({ type: 'AGENT_REMOVED', id: agent.id, notice: `Agente «${agent.name}» eliminado.` });
+        view.querySelector('h1').focus({ preventScroll: true });
+      },
+    });
   }
 
   search.addEventListener('input', () => {
@@ -90,5 +106,6 @@ export function mountAgents(view, store, openAgent) {
     paint();
   });
   store.subscribe((s) => s.ui.view, (v) => v === 'agentes' && paint());
+  store.subscribe((s) => s.ui.agentsRev, paint);
   paint();
 }

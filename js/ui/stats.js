@@ -2,6 +2,7 @@
 import { formatCurrency, formatDuration, formatNumber, formatPercent } from '../domain/format.js';
 import { casesChart } from './charts.js';
 import { h, icon } from './dom.js';
+import { emptyResults, isBlank } from './results-empty.js';
 
 const VOLUMES = [1000, 3000, 6000, 10000];
 
@@ -91,8 +92,13 @@ export function mountStats(root, store, getModel) {
     h('p', 'tag tag--example', 'Datos de ejemplo'),
   );
   const body = h('div', 'stats-grid');
-  root.replaceChildren(head, volumeControl(store), body);
-  const paint = () => body.replaceChildren(...buildBody(getModel(store.getState())));
+  const volume = volumeControl(store);
+  root.replaceChildren(head, volume, body);
+  const paint = () => {
+    const state = store.getState();
+    volume.hidden = isBlank(state);
+    body.replaceChildren(...(isBlank(state) ? [emptyResults(store)] : buildBody(getModel(state))));
+  };
   paint();
   store.subscribe((state) => state.graph, paint);
   store.subscribe((state) => state.scenario, paint);

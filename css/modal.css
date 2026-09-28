@@ -1,0 +1,121 @@
+/* Dialogos modales (editar agente, confirmar). Cerrados: hidden + inert (ver js/ui/dialog.js). */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: var(--color-scrim);
+}
+
+.modal__box {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 34rem;
+  max-height: 92dvh;
+  padding: var(--space-4);
+  overflow-y: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--color-surface-popover);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-xl);
+}
+
+[data-glass='on'] .modal__box {
+  border-color: var(--glass-edge);
+  box-shadow: var(--glass-shadow), var(--glass-ring);
+}
+
+@media (min-width: 768px) {
+  .modal {
+    align-items: center;
+    padding: var(--space-4);
+  }
+
+  .modal__box {
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+  }
+}
+
+.modal__title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  overflow-wrap: anywhere;
+}
+
+.modal__text {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.modal__body {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.modal__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.modal__footer .btn {
+  min-height: var(--tap-min);
+}
+
+.agent-editor {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.agent-editor__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.agent-editor__top .field {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.agent-editor__error {
+  margin: var(--space-1) 0 0;
+  color: var(--color-status-crit);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.agent-editor__hint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.results-empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+}
+
+.results-empty .btn {
+  min-height: var(--tap-min);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .modal__box {
+    animation: modal-in var(--transition-base);
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-3));
+  }
+}

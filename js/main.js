@@ -4,6 +4,9 @@ import { initGlassToggle } from './ui/glass-toggle.js';
 import { mountLogin } from './ui/login.js';
 import { createStore } from './store.js';
 import { reducer, createInitialState } from './reducer.js';
+import { EMPTY_GRAPH } from './reducer-agents.js';
+import { createNewAgentStarter } from './new-agent.js';
+import { cloneTemplateGraph } from './data/template-logistica.js';
 import { CATALOG } from './data/catalog.js';
 import { PRICING } from './pricing.config.js';
 import { computeMetrics } from './domain/metrics.js';
@@ -33,7 +36,6 @@ import { mountViews } from './views.js';
 import { mountHashSync, goTo, parseHash, clearHash } from './navigation.js';
 
 const DRAFT_DELAY_MS = 500;
-const EMPTY_GRAPH = { id: 'sin-agente', name: '', version: '1.0.0', nodes: [], edges: [] };
 
 // Sin agente abierto el grafo esta vacio; al abrir uno se carga su grafo (o su borrador).
 const store = createStore(reducer, createInitialState(EMPTY_GRAPH));
@@ -59,7 +61,7 @@ attachNodeDrag(svg, store);
 attachConnectDrag(svg, store);
 attachKeyboard(svg, store);
 mountMinimap(wrap, svg, store);
-mountControls(wrap, svg, store, restoreTemplate);
+mountControls(wrap, svg, store, restoreTemplate, loadFollowUpTemplate);
 mountSimulation(document.getElementById('stage-actions'), svg, store);
 mountPalette({
   palette: document.getElementById('palette'),
@@ -80,6 +82,13 @@ function restoreTemplate() {
   store.dispatch({ type: 'LOAD_TEMPLATE', graph: cloneAgentGraph(agentId) });
   fitToScreen(store, svg);
 }
+
+// Desde el lienzo vacio: parte de la plantilla de seguimiento conservando id y nombre del agente.
+function loadFollowUpTemplate() {
+  const { id, name } = store.getState().graph;
+  store.dispatch({ type: 'LOAD_TEMPLATE', graph: { ...cloneTemplateGraph(), id, name } });
+  fitToScreen(store, svg);
+}
 mountInspector(document.getElementById('inspector-panel'), store);
 mountInspectorToggle({
   view: document.getElementById('view-constructor'),
@@ -94,11 +103,15 @@ mountCosts(document.getElementById('costs'), store, getModel);
 
 // Vistas, navegacion por hash, coleccion de agentes y cabecera del constructor.
 const session = { active: false };
-const views = mountViews(store);
+const startNewAgent = createNewAgentStarter(store, () => views.focusHeading());
+const views = mountViews(store, () => startNewAgent(false));
 const syncHash = mountHashSync(store, () => session.active);
 mountBuilderHead(store, document.getElementById('view-constructor'));
-mountAgents(document.getElementById('view-agentes'), store, (id) =>
-  goTo(store, { view: 'constructor', id }),
+mountAgents(
+  document.getElementById('view-agentes'),
+  store,
+  (id) => goTo(store, { view: 'constructor', id }),
+  startNewAgent,
 );
 mountAccount();
 

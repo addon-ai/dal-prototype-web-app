@@ -1,25 +1,10 @@
 // Tarjetas de la coleccion de agentes (datos mock).
 import { h, icon } from './dom.js';
 import { ME } from '../data/agents/index.js';
+import { STATUS } from './agent-status.js';
+import { createAgentAvatar } from './avatar.js';
 
-const STATUS = {
-  activo: { label: 'Activo', path: 'M5 12l5 5 9-10', cls: 'ok' },
-  borrador: { label: 'Borrador', path: 'M4 20h4L19 9l-4-4L4 16z', cls: 'draft' },
-  'en-revision': {
-    label: 'En revisión',
-    path: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z',
-    cls: 'review',
-  },
-};
-const ICONS = [
-  'M4 5h16v11H9l-5 4z',
-  'M12 3l8 4v5c0 5-4 8-8 9-4-1-8-4-8-9V7z',
-  'M3 7h11v9H3zM14 10h4l3 3v3h-7z',
-  'M6 3h8l4 4v14H6zM9 12h6M9 16h6',
-  'M5 4h14v16H5zM9 9h6M9 13h6',
-  'M12 3a6 6 0 016 6c0 5 2 6 2 6H4s2-1 2-6a6 6 0 016-6zM10 19a2 2 0 004 0',
-  'M12 3a9 9 0 100 18 9 9 0 000-18zM3 12h18M12 3c3 3 3 15 0 18',
-];
+const ICON_TRASH = 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6';
 
 export function initials(name) {
   return name
@@ -42,16 +27,22 @@ function metric(value, label) {
   return box;
 }
 
-export function agentCard(agent, index, onOpen) {
+export function agentCard(agent, onOpen, onDelete) {
   const status = STATUS[agent.status];
   const card = h('li', 'agent-card panel');
   const head = h('div', 'agent-card__head');
-  const chip = h('span', 'agent-card__icon');
-  chip.append(icon(ICONS[index % ICONS.length]));
-  const title = h('h2', 'agent-card__title', agent.name);
+  const avatar = createAgentAvatar({
+    avatarId: agent.avatarId,
+    seed: agent.id,
+    size: 56,
+    name: agent.name,
+    status: agent.status,
+  });
   const badge = h('span', `badge badge--${status.cls}`);
   badge.append(icon(status.path), h('span', '', status.label));
-  head.append(chip, title);
+  const titles = h('div', 'agent-card__titles');
+  titles.append(h('h2', 'agent-card__title', agent.name), badge);
+  head.append(avatar, titles);
   const owner = h('span', 'agent-owner');
   const mine = agent.owner === ME;
   owner.append(
@@ -63,21 +54,37 @@ export function agentCard(agent, index, onOpen) {
   meta.append(owner, scope, h('span', '', `Editado ${relativeDate(agent.edited)}`));
   const metrics = h('div', 'agent-card__metrics');
   metrics.append(
-    metric(agent.casos.toLocaleString('es-CO'), 'casos del mes'),
-    metric(`${agent.auto} %`, 'automáticos'),
+    metric(agent.user ? '—' : agent.casos.toLocaleString('es-CO'), 'casos del mes'),
+    metric(agent.user ? '—' : `${agent.auto} %`, 'automáticos'),
   );
+  const actions = h('div', 'agent-card__actions');
   const open = h('button', 'btn btn--primary agent-card__open', 'Abrir en el constructor');
   open.type = 'button';
   open.setAttribute('aria-label', `Abrir en el constructor: ${agent.name}`);
   open.addEventListener('click', () => onOpen(agent.id));
-  card.append(head, badge, h('p', 'agent-card__desc', agent.description), meta, metrics, open);
+  actions.append(open);
+  if (agent.user) {
+    const del = h('button', 'btn btn--danger agent-card__delete');
+    del.type = 'button';
+    del.setAttribute('aria-label', `Eliminar agente: ${agent.name}`);
+    del.title = 'Eliminar agente';
+    del.append(icon(ICON_TRASH), h('span', 'agent-card__delete-text', 'Eliminar'));
+    del.addEventListener('click', () => onDelete(agent, del));
+    actions.append(del);
+  }
+  card.append(head, h('p', 'agent-card__desc', agent.description), meta, metrics, actions);
   return card;
 }
 
 export function newAgentCard(onCreate) {
   const card = h('li', 'agent-card agent-card--new panel');
-  card.append(
+  const head = h('div', 'agent-card__head');
+  head.append(
+    createAgentAvatar({ avatarId: 'orbe-rayo', size: 56, decorative: true, badge: 'mas' }),
     h('h2', 'agent-card__title', 'Nuevo agente'),
+  );
+  card.append(
+    head,
     h('p', 'agent-card__desc', 'Empieza con un lienzo vacío o parte de la plantilla de seguimiento.'),
   );
   [

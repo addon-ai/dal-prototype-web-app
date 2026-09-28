@@ -3,6 +3,7 @@ import { PRICING } from '../pricing.config.js';
 import { formatCurrency, formatNumber } from '../domain/format.js';
 import { meterBar } from './charts.js';
 import { h } from './dom.js';
+import { isBlank } from './results-empty.js';
 
 const DETAIL = {
   plan: 'Cuota mensual fija',
@@ -106,7 +107,13 @@ export function mountCosts(root, store, getModel) {
   );
   const body = h('div', 'cost-grid');
   root.replaceChildren(head, body);
-  const paint = () => body.replaceChildren(...buildBody(getModel(store.getState())));
+  const paint = () => {
+    const state = store.getState();
+    root.hidden = isBlank(state); // sin pasos no hay costos que mostrar
+    if (!root.hidden) {
+      body.replaceChildren(...buildBody(getModel(state)));
+    }
+  };
   paint();
   store.subscribe((state) => state.graph, paint);
   store.subscribe((state) => state.scenario, paint);

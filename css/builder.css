@@ -160,10 +160,11 @@
   inset: 0;
   z-index: 4;
   display: grid;
-  align-content: center;
+  align-content: safe center;
   justify-items: center;
   gap: var(--space-3);
   padding: var(--space-6);
+  overflow-y: auto;
   text-align: center;
   pointer-events: none;
 }
@@ -182,6 +183,29 @@
 
 .empty__title {
   font-size: var(--font-size-xl);
+}
+
+.empty__suggestions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  width: min(100%, 34rem);
+}
+
+.empty__suggest {
+  justify-content: flex-start;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: var(--space-2);
+  text-align: start;
+}
+
+.empty__suggest-text {
+  min-width: 0;
+}
+
+.empty__template {
+  min-height: var(--tap-min);
 }
 
 .empty__actions {
@@ -440,5 +464,23 @@
 @media (min-width: 1280px) {
   .view[data-selection='true'] .minimap {
     inset-inline-end: var(--space-4);
+  }
+}
+
+/* Lienzo vacio en pantallas bajas o estrechas: sin ilustracion y sin tapar los controles flotantes */
+@media (max-width: 767px), (max-height: 640px) {
+  .empty__art {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .empty {
+    padding-inline: calc(var(--tap-min) + var(--space-4)) var(--space-3);
+    pointer-events: auto; /* permite desplazar la lista con el dedo */
+  }
+
+  .empty__suggestions {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
