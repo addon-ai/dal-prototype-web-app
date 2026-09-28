@@ -1,0 +1,248 @@
+/* ============================================================
+   DAL Prototipo gerencial — Tokens de diseño (3 capas)
+   Origen: tokens de la app DAL @ commit f4fce1e (copia, no import).
+   Capa 1 primitive: unicos valores literales (colores, px, sombras).
+   Capa 2 semantic : significado (fondo, texto, borde); claro por
+                     defecto y oscuro via [data-theme='dark'].
+   Capa 3 component: nodos, lienzo y foco; solo referencian semantic.
+   Base tipografica 16px (el repo usa 14px; aqui se sube por lectura
+   en pantalla de reunion). Contrastes verificados AA.
+   Breakpoints (var() no es valido en @media, valores canonicos):
+     mobile < 768px | tablet >= 768px | laptop >= 1100px
+   ============================================================ */
+
+/* ── Capa 1: primitive ─────────────────────────────────────── */
+:root {
+  color-scheme: light;
+
+  /* Marca DAL */
+  --p-blue-900: #163a65;
+  --p-blue-500: #477099;
+  --p-blue-600: #4b7aa3;
+  --p-blue-300: #7aa3c9;
+  --p-teal-600: #338a7b;
+  --p-green-500: #12d27c;
+  --p-green-600: #0ea863;
+  --p-green-700: #0a8044;
+  --p-green-900: #065f36;
+  --p-coral-500: #ef8b72;
+  --p-red-700: #c24233;
+  --p-purple-600: #7c3aed;
+
+  /* Neutros */
+  --p-white: #ffffff;
+  --p-gray-50: #f8f9fa;
+  --p-gray-100: #f1f5f9;
+  --p-gray-150: #f0f4f8;
+  --p-gray-200: #eaf0f5;
+  --p-gray-250: #d0dce8;
+  --p-gray-300: #b9c9db;
+  --p-slate-400: #94a3b8;
+  --p-slate-500: #8ba3b8;
+  --p-slate-600: #64748b;
+  --p-slate-700: #334155;
+  --p-slate-750: #293548;
+  --p-slate-800: #1e293b;
+  --p-slate-900: #0f172a;
+
+  /* Textos de estado (claro / oscuro) */
+  --p-status-ok-light: #15803d;
+  --p-status-warn-light: #a16207;
+  --p-status-crit-light: #b91c1c;
+  --p-status-info-light: #1d4ed8;
+  --p-status-ok-dark: #34d399;
+  --p-status-warn-dark: #fbbf24;
+  --p-status-crit-dark: #f87171;
+  --p-status-info-dark: #60a5fa;
+
+  /* Sombras */
+  --p-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --p-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --p-shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --p-shadow-sm-dark: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --p-shadow-md-dark: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --p-shadow-lg-dark: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+
+  /* Tipografia */
+  --font-heading: 'Roboto', system-ui, -apple-system, sans-serif;
+  --font-subheading: 'Noto Sans', system-ui, -apple-system, sans-serif;
+  --font-primary: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-md: 18px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* Espaciado (base 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radios */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Movimiento */
+  --easing-brand: cubic-bezier(0.23, 1, 0.32, 1);
+  --transition-fast: 200ms var(--easing-brand);
+  --transition-base: 300ms var(--easing-brand);
+
+  /* Medidas de layout y accesibilidad */
+  --tap-min: 44px;
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --border-width: 1px;
+  --stroke-thin: 1.5px;
+  --stroke-base: 2px;
+  --stroke-bold: 3px;
+  --header-height: 60px;
+  --logo-height: 32px;
+  --content-max-width: 1400px;
+  --content-padding: var(--space-4);
+  --palette-width: 240px;
+  --inspector-width: 300px;
+  --canvas-min-height: 420px;
+  --sheet-max-height: 60vh;
+}
+
+/* ── Capa 2: semantic (claro por defecto) ──────────────────── */
+:root {
+  --color-accent: var(--p-green-500);
+  --color-accent-hover: var(--p-green-600);
+  --color-on-accent: var(--p-blue-900);
+  --color-accent-light: color-mix(in srgb, var(--color-accent) 12%, transparent);
+
+  --color-text-primary: var(--p-blue-900);
+  --color-text-secondary: var(--p-blue-500);
+  /* Repo usa blue-600 (4.3:1 sobre gray-50, no cumple AA); aqui blue-500 */
+  --color-text-muted: var(--p-blue-500);
+  --color-text-on-dark: var(--p-gray-100);
+
+  --color-bg-page: var(--p-gray-50);
+  --color-bg-card: var(--p-white);
+  --color-bg-raised: var(--p-gray-150);
+  --color-bg-code: var(--p-gray-100);
+
+  --color-border: var(--p-gray-300);
+  --color-border-light: var(--p-gray-200);
+  /* Bordes de controles: >= 3:1 contra el fondo (WCAG 1.4.11) */
+  --color-border-control: var(--p-blue-600);
+
+  --color-focus-ring: var(--p-blue-900);
+
+  --color-btn-primary-bg: var(--p-green-500);
+  --color-btn-primary-text: var(--p-blue-900);
+  --color-btn-primary-hover: var(--p-green-600);
+
+  --color-status-ok: var(--p-status-ok-light);
+  --color-status-warn: var(--p-status-warn-light);
+  --color-status-crit: var(--p-status-crit-light);
+  --color-status-info: var(--p-status-info-light);
+  --color-status-info-bg: color-mix(in srgb, var(--color-status-info) 10%, transparent);
+  --color-status-ok-bg: color-mix(in srgb, var(--color-status-ok) 10%, transparent);
+  --color-status-warn-bg: color-mix(in srgb, var(--color-status-warn) 12%, transparent);
+  --color-status-crit-bg: color-mix(in srgb, var(--color-status-crit) 10%, transparent);
+
+  --color-chart-grid: var(--p-gray-250);
+  --color-chart-1: var(--p-teal-600);
+  --color-chart-2: var(--p-blue-900);
+  --color-chart-3: var(--p-purple-600);
+  --color-chart-4: var(--p-red-700);
+
+  --color-scrollbar: var(--p-slate-400);
+
+  --shadow-sm: var(--p-shadow-sm);
+  --shadow-md: var(--p-shadow-md);
+  --shadow-lg: var(--p-shadow-lg);
+}
+
+/* ── Capa 2: semantic (oscuro) ─────────────────────────────── */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-on-accent: var(--p-slate-900);
+
+  --color-text-primary: var(--p-gray-100);
+  --color-text-secondary: var(--p-slate-400);
+  --color-text-muted: var(--p-slate-400);
+
+  --color-bg-page: var(--p-slate-900);
+  --color-bg-card: var(--p-slate-800);
+  --color-bg-raised: var(--p-slate-750);
+  --color-bg-code: var(--p-slate-900);
+
+  --color-border: var(--p-slate-700);
+  --color-border-light: var(--p-slate-800);
+  --color-border-control: var(--p-slate-500);
+
+  --color-focus-ring: var(--p-green-500);
+
+  --color-btn-primary-bg: var(--p-green-700);
+  --color-btn-primary-text: var(--p-white);
+  --color-btn-primary-hover: var(--p-green-900);
+
+  --color-status-ok: var(--p-status-ok-dark);
+  --color-status-warn: var(--p-status-warn-dark);
+  --color-status-crit: var(--p-status-crit-dark);
+  --color-status-info: var(--p-status-info-dark);
+
+  --color-chart-grid: var(--p-slate-700);
+  --color-chart-1: var(--p-green-500);
+  --color-chart-2: var(--p-blue-300);
+  --color-chart-3: var(--p-status-info-dark);
+  --color-chart-4: var(--p-coral-500);
+
+  --color-scrollbar: var(--p-slate-600);
+
+  --shadow-sm: var(--p-shadow-sm-dark);
+  --shadow-md: var(--p-shadow-md-dark);
+  --shadow-lg: var(--p-shadow-lg-dark);
+}
+
+/* ── Capa 3: component ─────────────────────────────────────── */
+:root {
+  /* Lienzo */
+  --canvas-bg: var(--color-bg-card);
+  --canvas-grid: var(--color-chart-grid);
+  --canvas-border: var(--color-border-control);
+  --canvas-edge: var(--color-text-secondary);
+  --canvas-edge-width: var(--stroke-base);
+  --canvas-edge-conditional: var(--color-text-primary);
+  --canvas-edge-conditional-width: var(--stroke-bold);
+  --canvas-edge-label-bg: var(--color-bg-card);
+  --canvas-edge-label-text: var(--color-text-primary);
+
+  /* Nodos (forma + icono + texto; el color solo refuerza) */
+  --node-bg: var(--color-bg-card);
+  --node-border: var(--color-border-control);
+  --node-border-width: var(--stroke-base);
+  --node-text: var(--color-text-primary);
+  --node-icon: var(--color-text-primary);
+  --node-selected-border: var(--color-focus-ring);
+  --node-selected-width: var(--stroke-bold);
+  --node-ghost-opacity: 0.6;
+  --node-min-size: var(--tap-min);
+  --node-ai-bg: var(--color-status-ok-bg);
+  --node-data-bg: var(--color-status-info-bg);
+  --node-control-bg: var(--color-status-warn-bg);
+  --node-person-bg: var(--color-accent-light);
+}

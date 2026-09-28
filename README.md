@@ -1,0 +1,66 @@
+# Prototipo gerencial de DAL
+
+Sitio estático (HTML + CSS + JS vanilla con módulos ES) para demostrar DAL a perfiles gerenciales.
+No usa build, dependencias npm ni red: toda la data es mock embebida en `js/data/`.
+
+## Origen
+
+Repositorio independiente: "Prototipo gerencial de DAL / Addon AI". No depende de ninguna app externa.
+Los tokens visuales (`css/tokens.css`) se copiaron de los estándares de diseño de la app DAL en su
+commit `f4fce1e`. Las reglas de React/TypeScript de la app no aplican aquí.
+`eslint-disable` está prohibido en `js/`.
+
+## Datos mock y precios ilustrativos
+
+Todas las cifras (métricas, costos, precios por modelo) son **datos mock ilustrativos**, generados de
+forma determinista a partir del grafo. No representan precios reales ni resultados de producción.
+
+## Abrirlo en local
+
+```bash
+python3 -m http.server 8080   # o: npx serve .
+```
+
+Luego abrir `http://localhost:8080/`. Los módulos ES requieren servidor HTTP; `file://` no funciona.
+
+## Publicación (GitHub Pages)
+
+URL: https://addon-ai.github.io/dal-prototype-web-app/
+
+1. En Settings > Pages, elegir Source: "GitHub Actions" (el workflow intenta habilitarlo con `enablement: true`).
+2. El workflow `.github/workflows/pages-prototype.yml` corre en push a `main` (ignora `openspec/**` y `*.md`) o manualmente (`workflow_dispatch`).
+3. En pull requests hacia `main` solo corre el job `verify`; `deploy` solo en `main` o `workflow_dispatch`.
+4. El artefacto publicado (`_site`) incluye solo `index.html`, `css/`, `js/` y `assets/`.
+5. El entorno `github-pages` puede restringir el deploy a la rama por defecto (Settings > Environments).
+6. El sitio se sirve bajo `/dal-prototype-web-app/`; por eso todas las rutas son relativas (`./`).
+
+El job `verify` comprueba: `node --check` de cada `.js`, ausencia de `fetch(`, `XMLHttpRequest`,
+`WebSocket`, `EventSource` y `eslint-disable`, ausencia de `*.test.js`/`*.spec.js` y de rutas absolutas
+en `index.html`.
+
+## Smoke de consola
+
+Con el sitio abierto, en la consola del navegador:
+
+```js
+const yaml = await import('./js/domain/yaml.js');
+console.log(Object.keys(yaml));
+```
+
+Repetir con `./js/domain/to-wire.js`, `./js/domain/metrics.js` y `./js/domain/costs.js`: cada módulo
+debe cargar sin errores y exponer sus funciones exportadas.
+
+## Checklist manual de verificación
+
+- [ ] Mouse: seleccionar, arrastrar y conectar nodos en el lienzo.
+- [ ] Teclado: recorrer con Tab, operar el lienzo y los paneles solo con teclado; foco siempre visible.
+- [ ] Táctil: arrastre y toques funcionan en un dispositivo táctil o emulado.
+- [ ] Tema claro y oscuro: ambos legibles; cambia con la preferencia del sistema.
+- [ ] Ancho de 375 px: sin scroll horizontal de página; paneles utilizables.
+- [ ] Contraste AA: texto normal >= 4.5:1 y texto grande/componentes >= 3:1 en ambos temas (DevTools > inspector de contraste).
+- [ ] `prefers-reduced-motion`: sin animaciones no esenciales.
+- [ ] Rótulos: cada control tiene nombre accesible y textos sin jerga técnica.
+- [ ] Receta colapsada por defecto y se expande con teclado.
+- [ ] Network: solo se solicitan las fuentes de Google Fonts, ninguna otra petición externa.
+- [ ] Fuentes bloqueadas: con Google Fonts bloqueado, la página usa fallbacks y sigue siendo usable.
+- [ ] Cifras idénticas entre dos cargas (determinismo).

@@ -1,0 +1,281 @@
+/* Lienzo, pasos, conexiones, paleta y ajustes. Solo tokens: nada de colores literales. */
+
+.canvas {
+  display: block;
+  max-width: none;
+  height: auto;
+  touch-action: pan-x pan-y;
+}
+
+.canvas__grid-line {
+  fill: none;
+  stroke: var(--canvas-grid);
+  stroke-width: 1px;
+  opacity: 0.5;
+}
+
+/* Pasos */
+.node {
+  cursor: grab;
+  touch-action: none;
+  color: var(--node-icon);
+}
+
+.node:active {
+  cursor: grabbing;
+}
+
+.node__shape {
+  fill: var(--node-bg);
+  stroke: var(--node-border);
+  stroke-width: var(--node-border-width);
+  transition: stroke-width var(--transition-fast);
+}
+
+.node__tint {
+  stroke: none;
+  pointer-events: none;
+}
+
+.node--ai .node__tint {
+  fill: var(--node-ai-bg);
+}
+
+.node--data .node__tint {
+  fill: var(--node-data-bg);
+}
+
+.node--control .node__tint {
+  fill: var(--node-control-bg);
+}
+
+.node--person .node__tint {
+  fill: var(--node-person-bg);
+}
+
+.node__icon {
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: var(--stroke-base);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.node__text {
+  fill: var(--node-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  dominant-baseline: central;
+  pointer-events: none;
+  user-select: none;
+}
+
+.node--selected .node__shape {
+  stroke: var(--node-selected-border);
+  stroke-width: var(--node-selected-width);
+}
+
+.node--connect-source .node__shape {
+  stroke-dasharray: 4 3;
+  stroke: var(--node-selected-border);
+  stroke-width: var(--node-selected-width);
+}
+
+.node--connect-target .node__shape {
+  stroke-dasharray: 2 3;
+}
+
+.node:focus-visible {
+  outline: none;
+}
+
+.node:focus-visible .node__shape {
+  stroke: var(--color-focus-ring);
+  stroke-width: var(--node-selected-width);
+  filter: drop-shadow(0 0 0 var(--color-focus-ring));
+}
+
+/* Conexiones */
+.edge {
+  cursor: pointer;
+}
+
+.edge__hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 24px;
+}
+
+.edge__line {
+  fill: none;
+  stroke: var(--canvas-edge);
+  stroke-width: var(--canvas-edge-width);
+  pointer-events: none;
+}
+
+.edge--conditional .edge__line {
+  stroke: var(--canvas-edge-conditional);
+  stroke-width: var(--canvas-edge-conditional-width);
+  stroke-dasharray: 8 5;
+}
+
+.edge--selected .edge__line {
+  stroke: var(--node-selected-border);
+}
+
+.edge:focus-visible {
+  outline: none;
+}
+
+.edge:focus-visible .edge__line {
+  stroke: var(--color-focus-ring);
+  stroke-width: var(--node-selected-width);
+}
+
+.arrow {
+  fill: var(--canvas-edge);
+}
+
+.arrow-cond {
+  fill: var(--canvas-edge-conditional);
+}
+
+.edge__label rect {
+  fill: var(--canvas-edge-label-bg);
+  stroke: var(--canvas-edge-conditional);
+  stroke-width: var(--stroke-thin);
+}
+
+.edge__label text {
+  fill: var(--canvas-edge-label-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* Paleta */
+.palette__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.palette-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'icon body'
+    'shape action';
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border-control);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  text-align: start;
+  cursor: grab;
+}
+
+.palette-item:hover {
+  background: var(--color-bg-raised);
+}
+
+.palette-item__icon {
+  grid-area: icon;
+}
+
+.palette-item__body {
+  grid-area: body;
+  display: grid;
+}
+
+.palette-item__name {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+}
+
+.palette-item__desc {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.palette-item__shape {
+  grid-area: shape;
+  width: 48px;
+  height: 18px;
+  fill: none;
+  stroke: var(--color-text-secondary);
+  stroke-width: 9px;
+}
+
+.palette-item__action {
+  grid-area: action;
+  justify-self: end;
+  padding: 0 var(--space-2);
+  border: var(--border-width) solid var(--color-border-control);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Paso fantasma mientras se arrastra desde la paleta */
+.ghost {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) dashed var(--node-selected-border);
+  border-radius: var(--radius-lg);
+  background: var(--node-bg);
+  color: var(--node-text);
+  font-size: var(--font-size-sm);
+  opacity: var(--node-ghost-opacity);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+/* Panel de ajustes */
+.field {
+  display: grid;
+  gap: var(--space-1);
+  margin-block-end: var(--space-3);
+}
+
+.field__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.field__scale,
+.inspector__type {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.inspector__type {
+  margin-block-end: var(--space-3);
+}
+
+.inspector__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.btn--danger {
+  border-color: var(--color-status-crit);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node__shape {
+    transition: none;
+  }
+}
