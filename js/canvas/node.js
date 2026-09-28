@@ -4,7 +4,7 @@ import { getCategory } from '../data/categories.js';
 import { NODE_W, NODE_H, HEADER_H, svgEl, wrapLabel, truncate } from './shapes.js';
 
 const R = 12;
-const TITLE_CHARS = 21;
+const TITLE_CHARS = 25;
 const LINE_H = 17;
 const BADGE_H = 18;
 const HEADER_PATH = `M0,${HEADER_H} V${R} A${R},${R} 0 0 1 ${R},0 H${NODE_W - R} A${R},${R} 0 0 1 ${NODE_W},${R} V${HEADER_H} Z`;
@@ -54,7 +54,7 @@ export function buildNode(entry) {
   const cattext = svgEl('text', { class: 'node__cat', x: 38, y: HEADER_H / 2 });
   cattext.textContent = cat.tag;
   const sub = svgEl('text', { class: 'node__sub', x: 12, y: NODE_H - 12 });
-  sub.textContent = truncate(entry.label, 26);
+  sub.textContent = truncate(entry.label, 32);
   g.append(
     svgEl('rect', {
       class: 'node__ring',

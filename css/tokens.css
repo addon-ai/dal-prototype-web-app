@@ -96,8 +96,8 @@
   --font-size-2xl: 24px;
   --font-size-3xl: 32px;
   /* Texto dentro de las tarjetas del lienzo: fijo, escala con el zoom (no con la escala TV) */
-  --font-size-node-title: 15px;
-  --font-size-node-meta: 12px;
+  --font-size-node-title: 13px;
+  --font-size-node-meta: 10.5px;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
