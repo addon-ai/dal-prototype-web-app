@@ -483,6 +483,12 @@
   --p-bg-node-light: rgba(0, 100, 200, 0.16);
   --p-bg-grid-step: 60px;
   --p-bg-text-light: #365a80;
+  /* Puntos interactivos (js/ui/dot-field.js): canal RGB, opacidad, radio y paso de la rejilla */
+  --p-dots-rgb-dark: 0, 212, 255;
+  --p-dots-rgb-light: 0, 100, 200;
+  --p-dots-opacity-dark: 0.35;
+  --p-dots-opacity-light: 0.2;
+  --p-dots-radius: 200px;
   --p-bg-text-dark: #a7b5c9;
 }
 
@@ -498,6 +504,10 @@
   --bg-node: var(--p-bg-node-light);
   /* Texto atenuado directamente sobre el fondo: mas oscuro que text-muted (4,5:1 en el peor punto) */
   --bg-text-muted: var(--p-bg-text-light);
+  --dots-rgb: var(--p-dots-rgb-light);
+  --dots-opacity: var(--p-dots-opacity-light);
+  --dots-radius: var(--p-dots-radius);
+  --dots-step: var(--p-bg-grid-step);
 }
 
 /* Capa 2: semantic (oscuro) */
@@ -511,6 +521,8 @@
   --bg-dot: var(--p-bg-dot-dark);
   --bg-node: var(--p-bg-node-dark);
   --bg-text-muted: var(--p-bg-text-dark);
+  --dots-rgb: var(--p-dots-rgb-dark);
+  --dots-opacity: var(--p-dots-opacity-dark);
 }
 
 /* Capa 3: component (fondo compuesto; capas de arriba hacia abajo) */
@@ -546,4 +558,56 @@
     radial-gradient(circle min(20rem, 50vw) at 12% 88%, var(--bg-glow-b), var(--bg-glow-b-soft) 50%, transparent),
     radial-gradient(circle min(16rem, 40vw) at 6% 18%, var(--bg-glow-c), var(--bg-glow-c-soft) 50%, transparent),
     var(--bg-base);
+}
+
+/* ── Botones (lenguaje del CTA "Solicita tu diagnostico gratuito" de la landing de Addon AI) ───
+   CTA de la landing: pildora (radio 999), degradado 135deg cian #0891b2 -> esmeralda #059669,
+   texto blanco 600, sin borde, hover con capa mas brillante (#06b6d4 -> #22c55e), elevacion de 2 px
+   y resplandor cian/esmeralda; secundario con borde y tinte cian. Esos tonos dan solo 3,68:1 y
+   3,77:1 con texto blanco, asi que se oscurecieron al minimo para llegar a AA (>= 4,5:1):
+   base #0e7490 -> #047857 (5,36:1 / 5,48:1) y hover #0b7f9e -> #06805b (4,62:1 / 4,95:1). */
+
+/* Capa 1: primitive */
+:root {
+  --p-btn-cyan-base: #0e7490;
+  --p-btn-emerald-base: #047857;
+  --p-btn-cyan-hover: #0b7f9e;
+  --p-btn-emerald-hover: #06805b;
+  --p-btn-cyan-text-light: #155e75;
+  --p-btn-cyan-text-dark: #22d3ee;
+  --p-btn-glow-cyan: rgba(6, 182, 212, 0.3);
+  --p-btn-glow-emerald: rgba(16, 185, 129, 0.2);
+  --p-btn-glow-cyan-soft: rgba(8, 145, 178, 0.14);
+  --p-btn-glow-emerald-soft: rgba(5, 150, 105, 0.1);
+  --p-btn-tracking: -0.15px;
+  --p-btn-lift: -2px;
+}
+
+/* Capa 3: component (claro por defecto) */
+:root {
+  --btn-radius: var(--radius-full);
+  --btn-tracking: var(--p-btn-tracking);
+  --btn-lift: var(--p-btn-lift);
+  --btn-primary-bg: linear-gradient(135deg, var(--p-btn-cyan-base), var(--p-btn-emerald-base));
+  --btn-primary-bg-hover: linear-gradient(135deg, var(--p-btn-cyan-hover), var(--p-btn-emerald-hover));
+  --btn-primary-text: var(--p-white);
+  --btn-primary-glow: 0 10px 40px var(--p-btn-glow-cyan-soft), 0 5px 15px var(--p-btn-glow-emerald-soft);
+  --btn-secondary-text: var(--p-btn-cyan-text-light);
+  --btn-secondary-border: color-mix(in srgb, var(--btn-secondary-text) 55%, transparent);
+  --btn-secondary-border-hover: color-mix(in srgb, var(--btn-secondary-text) 85%, transparent);
+  --btn-secondary-tint: color-mix(in srgb, var(--btn-secondary-text) 6%, transparent);
+  --btn-secondary-tint-hover: color-mix(in srgb, var(--btn-secondary-text) 10%, transparent);
+  --btn-secondary-glow: 0 8px 28px var(--p-btn-glow-cyan-soft);
+  --btn-danger-text: var(--color-status-crit);
+  --btn-danger-border: color-mix(in srgb, var(--color-status-crit) 60%, transparent);
+  --btn-danger-tint: color-mix(in srgb, var(--color-status-crit) 6%, transparent);
+  --btn-danger-tint-hover: color-mix(in srgb, var(--color-status-crit) 10%, transparent);
+  --btn-danger-glow: 0 8px 28px color-mix(in srgb, var(--color-status-crit) 22%, transparent);
+}
+
+/* Capa 3: component (oscuro) */
+[data-theme='dark'] {
+  --btn-primary-glow: 0 10px 40px var(--p-btn-glow-cyan), 0 5px 15px var(--p-btn-glow-emerald);
+  --btn-secondary-text: var(--p-btn-cyan-text-dark);
+  --btn-secondary-glow: 0 8px 28px var(--p-btn-glow-cyan);
 }

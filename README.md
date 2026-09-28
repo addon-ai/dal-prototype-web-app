@@ -63,6 +63,14 @@ de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (
   Agentes y Resultados. El Constructor conserva su lienzo. El claro deriva la variante que la landing no trae
   (mismos tonos de marca, resplandores en tintes más claros). Contraste medido en el peor píxel renderizado
   (1920/1440/375): texto sobre el fondo >= 4,57:1 claro y >= 5,47:1 oscuro; sobre cristal >= 4,71:1.
+- **Puntos interactivos del fondo** (`js/ui/dot-field.js`, tokens `--dots-*`): como en la landing, los puntos de la
+  rejilla de 60 px se iluminan y crecen en un radio de 200 px del cursor y, al pasar sobre un punto, nacen hilos
+  hacia puntos vecinos. Un `<canvas>` decorativo (`aria-hidden`, sin eventos) con un solo `requestAnimationFrame`
+  que se detiene con el cursor quieto. Se desmonta en el Constructor, con `prefers-reduced-motion`, en punteros
+  táctiles (`pointer: coarse`), bajo 768 px y con la pestaña oculta.
+- **Botones**: lenguaje del CTA «Solicita tu diagnóstico gratuito» de la landing (píldora, degradado cian a
+  esmeralda, resplandor y elevación al pasar). Tokens `--btn-*`; los tonos se oscurecieron al mínimo para llegar a
+  AA con texto blanco (base 5,36:1 / 5,48:1; hover 4,62:1 / 4,95:1).
 - **Ajustes del paso contraíbles**: el panel derecho se contrae a un riel (botón con `aria-expanded`;
   Escape lo contrae; se abre solo al seleccionar un paso). Estado opcional en `dal-proto-inspector`.
 

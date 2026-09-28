@@ -81,8 +81,8 @@
 }
 
 .tabs__btn[aria-selected='true'] {
-  background: var(--color-btn-primary-bg);
-  color: var(--color-btn-primary-text);
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
 }
 
 .recipe__pre {

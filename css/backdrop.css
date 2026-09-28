@@ -1,5 +1,5 @@
 /* Fondo general de la app (identidad de la landing de Addon AI).
-   Capa fija, estatica y sin eventos; solo tokens --bg-* (css/tokens.css).
+   Capa fija y sin eventos (los puntos reaccionan al cursor via canvas); solo tokens --bg-* (css/tokens.css).
    Aplica a Agentes y Resultados; el Constructor conserva su lienzo y su fondo. */
 
 body::before {
@@ -13,6 +13,16 @@ body::before {
 
 body[data-view='constructor']::before {
   display: none;
+}
+
+/* Puntos interactivos (js/ui/dot-field.js): canvas decorativo sobre los puntos estaticos, bajo el contenido */
+.dot-field {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* Texto atenuado que queda directo sobre el fondo (titulos, resumenes, conteos) */

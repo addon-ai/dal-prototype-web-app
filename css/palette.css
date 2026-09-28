@@ -238,9 +238,9 @@
 }
 
 .palette-item:hover .palette-item__action {
-  background: var(--color-btn-primary-bg);
-  border-color: var(--color-btn-primary-bg);
-  color: var(--color-btn-primary-text);
+  background: var(--btn-primary-bg);
+  border-color: transparent;
+  color: var(--btn-primary-text);
 }
 
 /* Tactil y movil: boton "Agregar" con texto en lugar del "+" decorativo */

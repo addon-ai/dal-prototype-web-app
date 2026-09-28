@@ -120,28 +120,34 @@ summary,
   box-shadow: none;
 }
 
-/* Boton de accion principal */
+/* Botones: lenguaje del CTA de la landing (pildora, degradado, resplandor). Solo tokens --btn-* */
 .btn {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border: var(--border-width) solid var(--color-border-control);
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-card);
-  color: var(--color-text-primary);
+  padding: var(--space-2) var(--space-5);
+  border: var(--border-width) solid var(--btn-secondary-border);
+  border-radius: var(--btn-radius);
+  background-color: var(--color-bg-card);
+  background-image: linear-gradient(var(--btn-secondary-tint), var(--btn-secondary-tint));
+  color: var(--btn-secondary-text);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-sm);
+  letter-spacing: var(--btn-tracking);
   transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast);
+    background-color var(--transition-base),
+    border-color var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .btn:hover {
-  background: var(--color-bg-raised);
+  border-color: var(--btn-secondary-border-hover);
+  background-image: linear-gradient(var(--btn-secondary-tint-hover), var(--btn-secondary-tint-hover));
+  box-shadow: var(--btn-secondary-glow);
 }
 
 .btn:active {
@@ -159,18 +165,68 @@ summary,
 
 .btn--ghost {
   border-color: transparent;
-  background: transparent;
+  background-color: transparent;
+  background-image: none;
+}
+
+.btn--ghost:hover {
+  border-color: var(--btn-secondary-border);
+  background-image: linear-gradient(var(--btn-secondary-tint), var(--btn-secondary-tint));
+  box-shadow: none;
 }
 
 .btn--primary {
-  background: var(--color-btn-primary-bg);
-  border-color: var(--color-btn-primary-bg);
-  color: var(--color-btn-primary-text);
+  overflow: hidden;
+  border-color: transparent;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+}
+
+/* Capa mas brillante que aparece al pasar (un degradado no se anima: se funde por opacidad) */
+.btn--primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--btn-primary-bg-hover);
+  opacity: 0;
+  transition: opacity var(--transition-base);
 }
 
 .btn--primary:hover {
-  background: var(--color-btn-primary-hover);
-  box-shadow: var(--shadow-md);
+  border-color: transparent;
+  background: var(--btn-primary-bg);
+  box-shadow: var(--btn-primary-glow);
+}
+
+.btn--primary:hover::before {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .btn {
+    min-height: var(--tap-min);
+  }
+}
+
+@media (hover: hover) {
+  .btn:not(.btn--icon):not(:disabled):hover {
+    transform: translateY(var(--btn-lift));
+  }
+
+  .btn:not(.btn--icon):not(:disabled):active {
+    transform: translateY(1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:not(.btn--icon):not(:disabled):hover,
+  .btn:not(.btn--icon):not(:disabled):active {
+    transform: none;
+  }
 }
 
 .icon {

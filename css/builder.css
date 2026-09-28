@@ -416,12 +416,15 @@
 }
 
 .btn--danger {
-  border-color: var(--color-status-crit);
-  color: var(--color-status-crit);
+  border-color: var(--btn-danger-border);
+  background-image: linear-gradient(var(--btn-danger-tint), var(--btn-danger-tint));
+  color: var(--btn-danger-text);
 }
 
 .btn--danger:hover {
-  background: var(--color-bg-raised);
+  border-color: var(--btn-danger-text);
+  background-image: linear-gradient(var(--btn-danger-tint-hover), var(--btn-danger-tint-hover));
+  box-shadow: var(--btn-danger-glow);
 }
 
 @media (min-width: 768px) {

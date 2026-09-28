@@ -1,5 +1,6 @@
 // Composition root: ensambla store, lienzo, paneles, vistas, borrador y tema.
 import './ui/theme.js';
+import { mountDotField } from './ui/dot-field.js';
 import { initGlassToggle } from './ui/glass-toggle.js';
 import { mountLogin } from './ui/login.js';
 import { createStore } from './store.js';
@@ -114,6 +115,7 @@ mountAgents(
   startNewAgent,
 );
 mountAccount();
+mountDotField();
 
 // Borrador por agente: se guarda 500 ms despues del ultimo cambio; sin localStorage, se ignora.
 let draftTimer = null;

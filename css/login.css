@@ -4,6 +4,11 @@
   display: contents;
 }
 
+/* Sin sesion la app no se ve: el acceso deja ver el fondo fijo (puntos interactivos incluidos) */
+.app-shell[inert] {
+  visibility: hidden;
+}
+
 .login {
   position: fixed;
   inset: 0;
@@ -12,7 +17,7 @@
   place-items: center;
   overflow: auto;
   padding: var(--space-6) var(--space-4);
-  background: var(--bg-backdrop);
+  background: transparent;
   transition:
     opacity var(--transition-slow),
     transform var(--transition-slow);
