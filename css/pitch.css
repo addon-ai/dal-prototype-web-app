@@ -286,9 +286,9 @@
 .pitch__dal {
   color: var(--color-text-primary);
   font-family: var(--font-heading);
-  font-size: clamp(5.5rem, 2rem + 12vw, 13rem);
+  font-size: clamp(3.4rem, 1rem + 7.5vw, 8.5rem);
   font-weight: 800;
-  line-height: 0.82;
+  line-height: 0.9;
   letter-spacing: -0.015em;
 }
 
@@ -300,9 +300,9 @@
 }
 
 .pitch__cover .pitch__lead {
-  max-width: 30ch;
+  max-width: 46ch;
   margin-top: clamp(18px, 3vh, 30px);
-  font-size: clamp(1.2rem, 0.9rem + 1vw, 1.7rem);
+  font-size: clamp(1.05rem, 0.85rem + 0.7vw, 1.4rem);
 }
 
 .pitch__cover-meta {
