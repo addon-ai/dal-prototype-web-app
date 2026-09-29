@@ -428,6 +428,17 @@
 }
 
 /* ---------- 2 Evidencia ---------- */
+/* Evidencia: las cifras usan un verde en lugar del ambar de advertencia. */
+.pitch__wall {
+  --pitch-warm: var(--p-green-700);
+  --pitch-warm-line: color-mix(in srgb, var(--p-green-700) 58%, transparent);
+}
+
+[data-theme='dark'] .pitch__wall {
+  --pitch-warm: var(--p-green-400);
+  --pitch-warm-line: color-mix(in srgb, var(--p-green-400) 58%, transparent);
+}
+
 .pitch__wall {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.75fr) minmax(0, 1fr);
