@@ -34,8 +34,8 @@
   outline-style: dashed;
 }
 
-.agent-avatar[data-status='review'] {
-  --ring: var(--color-status-info);
+.agent-avatar[data-status='off'] {
+  --ring: var(--color-status-off);
   outline-style: dotted;
 }
 

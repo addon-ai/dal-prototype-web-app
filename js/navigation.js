@@ -8,12 +8,29 @@ export const VIEWS = ['agentes', 'constructor', 'resultados'];
 const NEEDS_AGENT = ['constructor', 'resultados'];
 
 export function parseHash(hash) {
-  const [, view = '', id = ''] = /^#\/([a-z]+)(?:\/([\w-]+))?$/.exec(hash) ?? [];
+  const [, view = '', id = ''] = /^#\/([a-z]+)(?:\/([\w-]+))?(?:\?.*)?$/.exec(hash) ?? [];
   return VIEWS.includes(view) ? { view, id } : { view: 'agentes', id: '' };
 }
 
+// La vista Agentes puede llevar filtros en el hash (#/agentes?estado=activo); los aporta su modulo.
+let agentsQuery = () => '';
+export function setAgentsQuery(provider) {
+  agentsQuery = provider;
+}
+
 export function buildHash(view, agentId) {
+  if (view === 'agentes') {
+    return `#/agentes${agentsQuery()}`;
+  }
   return NEEDS_AGENT.includes(view) && agentId ? `#/${view}/${agentId}` : `#/${view}`;
+}
+
+// Refleja los filtros en el hash sin crear entradas de historial.
+export function syncQuery(store, isSignedIn) {
+  const hash = buildHash('agentes');
+  if (isSignedIn() && store.getState().ui.view === 'agentes' && window.location.hash !== hash) {
+    window.history.replaceState(null, '', hash);
+  }
 }
 
 // Carga el agente (con su borrador si existe) en el store. Devuelve false si no existe.
@@ -64,6 +81,7 @@ export function mountHashSync(store, isSignedIn) {
   window.addEventListener('hashchange', () => {
     if (isSignedIn()) {
       goTo(store, parseHash(window.location.hash));
+      write(); // un destino invalido (p. ej. agente eliminado) deja el hash de la vista real
     }
   });
   return write;

@@ -5,6 +5,7 @@ import { pickAvatarId, getAvatar } from '../avatars.js';
 import { loadAgentsState, saveAgentsState } from '../../agents-storage.js';
 import { ME } from './owner.js';
 import { SEED } from './seed.js';
+import { isStatus } from './status-ids.js';
 
 export { ME };
 
@@ -28,7 +29,7 @@ function hydrate(card) {
     id: card.id,
     name: card.name.slice(0, NAME_MAX),
     description: describe(card.fromTemplate),
-    status: 'borrador',
+    status: isStatus(card.status) ? card.status : 'borrador',
     owner: ME,
     scope: 'personal',
     edited: 0,
@@ -44,13 +45,15 @@ function hydrate(card) {
 const stored = loadAgentsState();
 let sequence = stored.seq;
 const overrides = { ...stored.overrides };
+const deleted = new Set(stored.deleted);
 const created = stored.created.map(hydrate);
 
 function persist() {
   saveAgentsState({
     seq: sequence,
     overrides,
-    created: created.map(({ id, name, avatarId, fromTemplate }) => ({ id, name, avatarId, fromTemplate })),
+    deleted: [...deleted],
+    created: created.map(({ id, name, avatarId, fromTemplate, status }) => ({ id, name, avatarId, fromTemplate, status })),
   });
 }
 
@@ -61,11 +64,12 @@ function withOverride(agent) {
   }
   const avatarId = getAvatar(patch.avatarId) ? patch.avatarId : agent.avatarId;
   const name = typeof patch.name === 'string' && patch.name ? patch.name.slice(0, NAME_MAX) : agent.name;
-  return { ...agent, name, avatarId };
+  const status = isStatus(patch.status) ? patch.status : agent.status;
+  return { ...agent, name, avatarId, status };
 }
 
 export function listAgents() {
-  return [...created, ...SEED.map(withOverride)];
+  return [...created, ...SEED.filter((agent) => !deleted.has(agent.id)).map(withOverride)];
 }
 
 export function getAgent(id) {
@@ -88,15 +92,21 @@ export function createAgent(fromTemplate) {
   return agent;
 }
 
-// Cambia nombre y/o avatar (mock: queda como ajuste local; creados: se edita la ficha).
-export function updateAgent(id, { name, avatarId }) {
+// Cambia nombre, avatar y/o estado (mock: queda como ajuste local; creados: se edita la ficha).
+export function updateAgent(id, { name, avatarId, status }) {
   const own = created.find((agent) => agent.id === id);
   const clean = (name ?? '').trim().slice(0, NAME_MAX);
   if (own) {
     own.name = clean || own.name;
     own.avatarId = getAvatar(avatarId) ? avatarId : own.avatarId;
+    own.status = isStatus(status) ? status : own.status;
   } else if (SEED.some((agent) => agent.id === id)) {
-    overrides[id] = { ...overrides[id], ...(clean ? { name: clean } : {}), ...(getAvatar(avatarId) ? { avatarId } : {}) };
+    overrides[id] = {
+      ...overrides[id],
+      ...(clean ? { name: clean } : {}),
+      ...(getAvatar(avatarId) ? { avatarId } : {}),
+      ...(isStatus(status) ? { status } : {}),
+    };
   } else {
     return null;
   }
@@ -104,13 +114,27 @@ export function updateAgent(id, { name, avatarId }) {
   return getAgent(id);
 }
 
-// Solo se eliminan los agentes creados por el usuario.
-export function deleteAgent(id) {
-  const index = created.findIndex((agent) => agent.id === id);
-  if (index < 0) {
-    return false;
-  }
-  created.splice(index, 1);
+// Elimina agentes: los creados por el usuario se borran del todo y los de ejemplo se ocultan
+// (`deleted`) para poder restaurarlos. Devuelve cuantos se eliminaron.
+export function deleteAgents(ids) {
+  let count = 0;
+  ids.forEach((id) => {
+    const index = created.findIndex((agent) => agent.id === id);
+    if (index >= 0) {
+      created.splice(index, 1);
+      count += 1;
+    } else if (SEED.some((agent) => agent.id === id) && !deleted.has(id)) {
+      deleted.add(id);
+      count += 1;
+    }
+  });
   persist();
-  return true;
+  return count;
+}
+
+export const countHiddenSamples = () => deleted.size;
+
+export function restoreSamples() {
+  deleted.clear();
+  persist();
 }

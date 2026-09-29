@@ -89,19 +89,22 @@ button {
   cursor: pointer;
 }
 
-/* Objetivos tactiles >= 44px */
+/* Objetivos: 36px con puntero fino y 44px en tactil (--btn-min-height cambia en pointer: coarse) */
 button,
 select,
-input:not([type='range']),
-summary,
-.tap-target {
-  min-height: var(--tap-min);
+input:not([type='range'], [type='checkbox']),
+summary {
+  min-height: var(--btn-min-height);
 }
 
 button,
-summary,
+summary {
+  min-width: var(--btn-min-height);
+}
+
 .tap-target {
   min-width: var(--tap-min);
+  min-height: var(--tap-min);
 }
 
 /* Foco reforzado (>= 2px, >= 3:1); el anillo verde de 10 % de la app era casi invisible */
@@ -120,23 +123,26 @@ summary,
   box-shadow: none;
 }
 
-/* Botones: lenguaje del CTA de la landing (pildora, degradado, resplandor). Solo tokens --btn-* */
+/* Botones: lenguaje del CTA de la landing (pildora, degradado) en version ligera. Solo tokens --btn-* */
 .btn {
   position: relative;
   isolation: isolate;
+  min-height: var(--btn-min-height);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-5);
+  padding: 0 var(--btn-pad-x);
   border: var(--border-width) solid var(--btn-secondary-border);
   border-radius: var(--btn-radius);
   background-color: var(--color-bg-card);
   background-image: linear-gradient(var(--btn-secondary-tint), var(--btn-secondary-tint));
   color: var(--btn-secondary-text);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-sm);
+  font-weight: var(--btn-weight);
+  font-size: var(--btn-font-size);
   letter-spacing: var(--btn-tracking);
+  line-height: var(--btn-line-height);
+  white-space: nowrap;
   transition:
     background-color var(--transition-base),
     border-color var(--transition-base),
@@ -160,7 +166,8 @@ summary,
 }
 
 .btn--icon {
-  padding: var(--space-2);
+  width: var(--btn-min-height);
+  padding: 0;
 }
 
 .btn--ghost {
@@ -179,9 +186,8 @@ summary,
   overflow: hidden;
   border-color: transparent;
   background: var(--btn-primary-bg);
+  box-shadow: var(--btn-primary-shadow);
   color: var(--btn-primary-text);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-md);
 }
 
 /* Capa mas brillante que aparece al pasar (un degradado no se anima: se funde por opacidad) */
@@ -206,12 +212,6 @@ summary,
   opacity: 1;
 }
 
-@media (pointer: coarse) {
-  .btn {
-    min-height: var(--tap-min);
-  }
-}
-
 @media (hover: hover) {
   .btn:not(.btn--icon):not(:disabled):hover {
     transform: translateY(var(--btn-lift));
@@ -223,6 +223,11 @@ summary,
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn--primary::before {
+    transition: none;
+  }
+
   .btn:not(.btn--icon):not(:disabled):hover,
   .btn:not(.btn--icon):not(:disabled):active {
     transform: none;

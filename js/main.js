@@ -34,7 +34,7 @@ import { mountAgents } from './ui/agents.js';
 import { mountAccount } from './ui/account.js';
 import { mountBuilderHead } from './ui/builder-head.js';
 import { mountViews } from './views.js';
-import { mountHashSync, goTo, parseHash, clearHash } from './navigation.js';
+import { mountHashSync, goTo, parseHash, clearHash, syncQuery } from './navigation.js';
 
 const DRAFT_DELAY_MS = 500;
 
@@ -113,6 +113,7 @@ mountAgents(
   store,
   (id) => goTo(store, { view: 'constructor', id }),
   startNewAgent,
+  () => syncQuery(store, () => session.active),
 );
 mountAccount();
 mountDotField();

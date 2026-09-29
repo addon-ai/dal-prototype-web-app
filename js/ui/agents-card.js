@@ -4,8 +4,6 @@ import { ME } from '../data/agents/index.js';
 import { STATUS } from './agent-status.js';
 import { createAgentAvatar } from './avatar.js';
 
-const ICON_TRASH = 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6';
-
 export function initials(name) {
   return name
     .split(' ')
@@ -27,7 +25,29 @@ function metric(value, label) {
   return box;
 }
 
-export function agentCard(agent, onOpen, onDelete) {
+// Casilla de seleccion nativa: la etiqueta amplia el area clicable; el nombre accesible incluye al agente.
+function selectBox(agent) {
+  const label = h('label', 'check agent-card__check');
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.className = 'check__input';
+  input.dataset.id = agent.id;
+  input.setAttribute('aria-label', `Seleccionar ${agent.name}`);
+  label.append(input);
+  return label;
+}
+
+// Cambio rapido de estado: activar / desactivar. Los cambios finos se hacen en "Editar agente".
+function statusToggle(agent, status, onStatus) {
+  const button = h('button', 'btn agent-card__state', status.action);
+  button.type = 'button';
+  button.dataset.statusFor = agent.id;
+  button.setAttribute('aria-label', `${status.action} ${agent.name}`);
+  button.addEventListener('click', () => onStatus(agent, status.next));
+  return button;
+}
+
+export function agentCard(agent, { onOpen, onStatus }) {
   const status = STATUS[agent.status];
   const card = h('li', 'agent-card panel');
   const head = h('div', 'agent-card__head');
@@ -63,16 +83,9 @@ export function agentCard(agent, onOpen, onDelete) {
   open.setAttribute('aria-label', `Abrir en el constructor: ${agent.name}`);
   open.addEventListener('click', () => onOpen(agent.id));
   actions.append(open);
-  if (agent.user) {
-    const del = h('button', 'btn btn--danger agent-card__delete');
-    del.type = 'button';
-    del.setAttribute('aria-label', `Eliminar agente: ${agent.name}`);
-    del.title = 'Eliminar agente';
-    del.append(icon(ICON_TRASH), h('span', 'agent-card__delete-text', 'Eliminar'));
-    del.addEventListener('click', () => onDelete(agent, del));
-    actions.append(del);
-  }
-  card.append(head, h('p', 'agent-card__desc', agent.description), meta, metrics, actions);
+  actions.append(statusToggle(agent, status, onStatus));
+  card.dataset.id = agent.id;
+  card.append(selectBox(agent), head, h('p', 'agent-card__desc', agent.description), meta, metrics, actions);
   return card;
 }
 

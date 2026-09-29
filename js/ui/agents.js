@@ -1,110 +1,110 @@
-// Coleccion de agentes: saludo, filtros con conteos, busqueda, orden y cuadricula de tarjetas.
-import { h } from './dom.js';
+// Coleccion de agentes: saludo, filtros (alcance, estado, busqueda), seleccion multiple con un
+// solo "Eliminar" y cuadricula de tarjetas. Filtros y busqueda viajan en el hash (#/agentes?...).
+import { h, icon } from './dom.js';
 import { agentCard, newAgentCard } from './agents-card.js';
-import { listAgents, deleteAgent, ME } from '../data/agents/index.js';
+import { listAgents, deleteAgents, updateAgent, countHiddenSamples, restoreSamples } from '../data/agents/index.js';
 import { clearDraft } from '../draft-storage.js';
 import { askConfirm } from './confirm-dialog.js';
+import { STATUS } from './agent-status.js';
+import { createFilterBar, defaultFilters, filterAgents, filtersQuery, readFilters, SORTS } from './agents-filters.js';
+import { createSelection, describeAgents } from './agents-selection.js';
+import { emptyState } from './agents-empty.js';
+import { setAgentsQuery } from '../navigation.js';
 
-const FILTERS = [
-  ['todos', 'Todos', () => true],
-  ['mios', 'Míos', (agent) => agent.owner === ME],
-  ['org', 'De mi organización', (agent) => agent.scope === 'organizacion'],
-];
-const SORTS = [
-  ['recientes', 'Más recientes', (a, b) => a.edited - b.edited],
-  ['nombre', 'Nombre (A a Z)', (a, b) => a.name.localeCompare(b.name, 'es')],
-];
-const normalize = (text) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+const RESTORE = 'M4 12a8 8 0 108-8M4 4v5h5';
 
-export function mountAgents(view, store, openAgent, createNew) {
+export function mountAgents(view, store, openAgent, createNew, onFiltersChange = () => {}) {
   const root = view.querySelector('#agents-root');
-  const state = { filter: 'todos', query: '', sort: 'recientes' };
+  const f = readFilters(window.location.hash);
+  const title = () => view.querySelector('h1');
+  setAgentsQuery(() => filtersQuery(f));
 
   const intro = h('p', 'agents__intro', 'Hola, Camila. Estos son los agentes de Transportes Andina S.A.S. (ejemplo).');
-  const bar = h('div', 'agents__bar');
-  const filters = h('div', 'agents__filters');
-  filters.setAttribute('role', 'group');
-  filters.setAttribute('aria-label', 'Filtrar agentes');
-  const search = document.createElement('input');
-  search.type = 'search';
-  search.id = 'agents-search';
-  search.className = 'select agents__search';
-  search.placeholder = 'Buscar un agente…';
-  search.setAttribute('aria-label', 'Buscar un agente');
-  const sortSelect = document.createElement('select');
-  sortSelect.className = 'select';
-  sortSelect.setAttribute('aria-label', 'Ordenar agentes');
-  SORTS.forEach(([value, label]) => {
-    const option = h('option', '', label);
-    option.value = value;
-    sortSelect.append(option);
-  });
+  const filterBar = createFilterBar(f, paint);
+  const selection = createSelection({ root, onDelete });
   const status = h('p', 'agents__status');
   status.setAttribute('role', 'status');
+  const restore = h('button', 'btn btn--ghost agents__restore');
+  restore.type = 'button';
+  restore.prepend(icon(RESTORE));
+  restore.append(h('span', '', 'Restaurar agentes de ejemplo'));
+  restore.addEventListener('click', doRestore);
+  const info = h('div', 'agents__info');
+  info.append(status, restore);
   const grid = h('ul', 'agents__grid');
-  bar.append(filters, search, sortSelect);
-  root.append(intro, bar, status, grid);
-
-  function paintFilters() {
-    filters.replaceChildren();
-    FILTERS.forEach(([id, label, test]) => {
-      const count = listAgents().filter(test).length;
-      const button = h('button', 'btn agents__filter', `${label} (${count})`);
-      button.type = 'button';
-      button.setAttribute('aria-pressed', String(state.filter === id));
-      button.addEventListener('click', () => {
-        state.filter = id;
-        paint();
-      });
-      filters.append(button);
-    });
-  }
+  root.append(intro, filterBar.el, selection.bar, info, grid);
 
   function paint() {
-    const test = FILTERS.find(([id]) => id === state.filter)[2];
-    const order = SORTS.find(([id]) => id === state.sort)[2];
-    const q = normalize(state.query.trim());
-    const shown = listAgents()
-      .filter(test)
-      .filter((a) => !q || normalize(`${a.name} ${a.description}`).includes(q))
-      .sort(order);
-    paintFilters();
-    grid.replaceChildren(...shown.map((agent) => agentCard(agent, openAgent, onDelete)));
-    if (state.filter !== 'org') {
-      grid.append(newAgentCard(onCreate));
+    const all = listAgents();
+    filterBar.paint(all);
+    const order = SORTS.find(([id]) => id === f.sort)[2];
+    const shown = filterAgents(all, f).sort(order);
+    const cards = shown.map((agent) => agentCard(agent, { onOpen: openAgent, onStatus: changeStatus }));
+    if (all.length === 0) {
+      cards.push(emptyState('none', { onRestore: doRestore, onCreate: () => createNew(false) }));
+    } else if (shown.length === 0) {
+      cards.push(emptyState('filters', { onClear: clearFilters }));
+    } else if (f.scope !== 'org' && f.estado === 'todos' && !f.query.trim()) {
+      cards.push(newAgentCard(createNew));
     }
-    status.textContent = shown.length
-      ? `${shown.length} ${shown.length === 1 ? 'agente' : 'agentes'}`
-      : 'No hay agentes con este filtro o búsqueda. Cambia el filtro o crea uno nuevo.';
+    grid.replaceChildren(...cards);
+    selection.setVisible(shown.map((agent) => agent.id));
+    restore.hidden = countHiddenSamples() === 0 || all.length === 0;
+    const none = all.length ? 'No hay agentes con estos filtros.' : 'No hay agentes.';
+    status.textContent = shown.length ? `${shown.length} ${shown.length === 1 ? 'agente' : 'agentes'}` : none;
+    onFiltersChange();
   }
 
-  const onCreate = (fromTemplate) => createNew(fromTemplate);
+  function clearFilters() {
+    Object.assign(f, defaultFilters(), { sort: f.sort });
+    filterBar.sync();
+    paint();
+    view.querySelector('.agents__filter')?.focus();
+  }
 
-  function onDelete(agent, trigger) {
+  function changeStatus(agent, next) {
+    updateAgent(agent.id, { status: next });
+    store.dispatch({
+      type: 'AGENTS_CHANGED',
+      notice: `«${agent.name}» ahora está ${STATUS[next].label.toLowerCase()}.`,
+    });
+    grid.querySelector(`[data-status-for="${agent.id}"]`)?.focus();
+  }
+
+  function doRestore() {
+    restoreSamples();
+    store.dispatch({ type: 'AGENTS_CHANGED', notice: 'Agentes de ejemplo restaurados.' });
+    title().focus({ preventScroll: true });
+  }
+
+  function onDelete(ids, trigger) {
+    const chosen = listAgents().filter((agent) => ids.includes(agent.id));
+    const n = chosen.length;
+    const noun = n === 1 ? '1 agente' : `${n} agentes`;
     askConfirm({
       trigger,
-      title: `¿Eliminar «${agent.name}»?`,
-      text: 'Se borran el agente, su avatar y su borrador de este navegador. No se puede deshacer.',
-      confirmLabel: 'Eliminar agente',
-      fallbackFocus: () => view.querySelector('h1'),
+      title: n === 1 ? '¿Eliminar 1 agente?' : `¿Eliminar ${n} agentes?`,
+      text: `Vas a eliminar ${noun}: ${describeAgents(chosen)}. Esta acción no se puede deshacer.`,
+      confirmLabel: `Eliminar ${noun}`,
+      fallbackFocus: title,
       onConfirm: () => {
-        deleteAgent(agent.id);
-        clearDraft(agent.id);
-        store.dispatch({ type: 'AGENT_REMOVED', id: agent.id, notice: `Agente «${agent.name}» eliminado.` });
-        view.querySelector('h1').focus({ preventScroll: true });
+        chosen.forEach((agent) => clearDraft(agent.id));
+        deleteAgents(ids);
+        selection.clear();
+        store.dispatch({ type: 'AGENT_REMOVED', ids, notice: n === 1 ? '1 agente eliminado.' : `${n} agentes eliminados.` });
+        title().focus({ preventScroll: true });
       },
     });
   }
 
-  search.addEventListener('input', () => {
-    state.query = search.value;
-    paint();
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash.startsWith('#/agentes')) {
+      Object.assign(f, readFilters(window.location.hash), { sort: f.sort });
+      filterBar.sync();
+      paint();
+    }
   });
-  sortSelect.addEventListener('change', () => {
-    state.sort = sortSelect.value;
-    paint();
-  });
-  store.subscribe((s) => s.ui.view, (v) => v === 'agentes' && paint());
+  store.subscribe((s) => s.ui.view, (v) => (v === 'agentes' ? paint() : selection.clear()));
   store.subscribe((s) => s.ui.agentsRev, paint);
   paint();
 }

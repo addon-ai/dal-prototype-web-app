@@ -1,9 +1,10 @@
-// Dialogo "Editar agente": nombre y avatar. Guarda con "Guardar" (o Enter); Escape cancela.
+// Dialogo "Editar agente": nombre, estado y avatar. Guarda con "Guardar" (o Enter); Escape cancela.
 import { getAgent, updateAgent } from '../data/agents/index.js';
 import { createAgentAvatar } from './avatar.js';
 import { createAvatarPicker } from './avatar-picker.js';
 import { createDialog, dialogButton } from './dialog.js';
 import { h } from './dom.js';
+import { STATUS } from './agent-status.js';
 
 const NAME_MAX = 60;
 let ui = null;
@@ -25,9 +26,21 @@ function build(store) {
   error.setAttribute('role', 'alert');
   error.hidden = true;
   field.append(label, input, error);
+  const stateField = h('div', 'field');
+  const stateLabel = h('label', 'field__label', 'Estado');
+  const stateSelect = document.createElement('select');
+  stateSelect.id = 'agent-editor-status';
+  stateSelect.className = 'select';
+  stateLabel.htmlFor = stateSelect.id;
+  Object.entries(STATUS).forEach(([value, item]) => {
+    const option = h('option', '', item.label);
+    option.value = value;
+    stateSelect.append(option);
+  });
+  stateField.append(stateLabel, stateSelect);
   const picker = createAvatarPicker({ value: '', onChange: (id) => paintPreview(id) });
   const hint = h('p', 'muted agent-editor__hint', 'Elige un avatar. Usa las flechas para recorrerlos.');
-  form.append(h('div', 'agent-editor__top'), hint, picker.el);
+  form.append(h('div', 'agent-editor__top'), stateField, hint, picker.el);
   form.firstChild.append(preview, field);
   dialog.body.append(form);
 
@@ -47,7 +60,7 @@ function build(store) {
       return;
     }
     const { agentId } = ui;
-    const agent = updateAgent(agentId, { name, avatarId: picker.get() });
+    const agent = updateAgent(agentId, { name, avatarId: picker.get(), status: stateSelect.value });
     dialog.close();
     store.dispatch({
       type: 'AGENTS_CHANGED',
@@ -60,7 +73,7 @@ function build(store) {
     dialogButton('Cancelar', 'btn', () => dialog.close()),
     dialogButton('Guardar', 'btn btn--primary', () => form.requestSubmit()),
   );
-  return { dialog, input, picker, error, paintPreview, agentId: null };
+  return { dialog, input, picker, error, paintPreview, stateSelect, agentId: null };
 }
 
 export function openAgentEditor(store, agentId, trigger) {
@@ -72,6 +85,7 @@ export function openAgentEditor(store, agentId, trigger) {
   ui.agentId = agentId;
   ui.input.value = agent.name;
   ui.error.hidden = true;
+  ui.stateSelect.value = agent.status;
   ui.picker.set(agent.avatarId);
   ui.paintPreview(agent.avatarId);
   ui.dialog.open(trigger, ui.input);

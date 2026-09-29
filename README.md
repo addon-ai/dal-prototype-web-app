@@ -28,13 +28,21 @@ de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (
 ## Agentes, cuenta y rutas
 
 - **Agentes** (`#/agentes`): colección mock de 7 agentes de logística (`js/data/agents/`), con filtros
-  Todos/Míos/De mi organización, búsqueda, orden y tarjeta "Nuevo agente". Cada agente tiene su grafo,
+  de alcance (Todos/Míos/De mi organización), de estado (Borrador/Activo/Inactivo, con conteos que respetan
+  alcance y búsqueda), búsqueda de texto (nombre, descripción, propietario y estado; `type=search`, botón limpiar,
+  debounce 200 ms), orden y tarjeta "Nuevo agente". Los filtros se combinan (AND) y viajan en el hash
+  (`#/agentes?alcance=mios&estado=activo&q=texto`). Cada agente tiene su grafo,
   receta, resultados y costos; el borrador se guarda por agente (`dal-proto-draft-v2:<id>`).
 - **Avatares**: 14 avatares SVG en línea (`js/data/avatars.js`, dibujo en `js/ui/avatar.js`), sin imágenes
   externas. Se editan junto al nombre con el botón «Editar» del constructor (diálogo accesible).
 - **Constructor = agente nuevo**: la pestaña «Constructor» crea un agente en blanco («Agente nuevo N»).
   Los agentes creados y los cambios de nombre/avatar se guardan en `dal-proto-agents-v1` (localStorage,
-  opcional); los creados se pueden eliminar con confirmación.
+  opcional); el estado se cambia en «Editar agente» o con «Activar/Desactivar» en la tarjeta (se guarda como ajuste local).
+  Cada tarjeta tiene una casilla de selección; la barra sobre la cuadrícula ofrece «Seleccionar todos» (los
+  visibles según filtros), contador, «Limpiar selección» y un único «Eliminar» que abre la confirmación y borra en
+  bloque. Se pueden eliminar todos: los creados se borran (con su borrador) y los de ejemplo se ocultan en
+  `deleted`; el estado vacío ofrece «Restaurar agentes de ejemplo». La selección conserva solo lo que sigue visible
+  al cambiar filtros y se reinicia al salir de la vista.
 - **Rutas por hash**: `#/agentes`, `#/constructor/:id`, `#/resultados/:id` (solo hash, sin red).
 - **Cuenta**: el avatar de la barra abre un panel con usuario y empresa de ejemplo, tema (también visible en la barra y en el acceso), cristal y
   "Cerrar sesión".
@@ -68,9 +76,10 @@ de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (
   hacia puntos vecinos. Un `<canvas>` decorativo (`aria-hidden`, sin eventos) con un solo `requestAnimationFrame`
   que se detiene con el cursor quieto. Se desmonta en el Constructor, con `prefers-reduced-motion`, en punteros
   táctiles (`pointer: coarse`), bajo 768 px y con la pestaña oculta.
-- **Botones**: lenguaje del CTA «Solicita tu diagnóstico gratuito» de la landing (píldora, degradado cian a
-  esmeralda, resplandor y elevación al pasar). Tokens `--btn-*`; los tonos se oscurecieron al mínimo para llegar a
-  AA con texto blanco (base 5,36:1 / 5,48:1; hover 4,62:1 / 4,95:1).
+- **Botones**: lenguaje del CTA «Solicita tu diagnóstico gratuito» de la landing en versión ligera (píldora de
+  36 px con puntero fino y 44 px en `pointer: coarse` vía `--btn-min-height`, texto 500 de `--font-size-sm`,
+  padding lateral de 16 px, degradado cian a esmeralda, resplandor pequeño y elevación de 1 px al pasar).
+  Tokens `--btn-*`; texto blanco sobre el degradado >= 4,5:1 (base 4,81:1 / 5,14:1; hover 4,56:1 / 4,64:1).
 - **Ajustes del paso contraíbles**: el panel derecho se contrae a un riel (botón con `aria-expanded`;
   Escape lo contrae; se abre solo al seleccionar un paso). Estado opcional en `dal-proto-inspector`.
 

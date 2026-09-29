@@ -1,9 +1,10 @@
 // Fichas de agentes del usuario en localStorage (clave versionada). Toda operacion es segura si el
 // almacenamiento falla. Solo guarda datos del agente (nunca credenciales ni datos de la cuenta).
-// Forma: { seq, created: [ficha], overrides: { [idMock]: { name, avatarId } } }
+// Forma: { seq, created: [ficha], overrides: { [idMock]: { name, avatarId, status } }, deleted: [idMock] }
+// `deleted` son los ids de agentes de ejemplo ocultos por el usuario (se pueden restaurar).
 const KEY = 'dal-proto-agents-v1';
 
-const EMPTY = () => ({ seq: 0, created: [], overrides: {} });
+const EMPTY = () => ({ seq: 0, created: [], overrides: {}, deleted: [] });
 const isText = (value) => typeof value === 'string' && value.length > 0 && value.length <= 200;
 
 function validCard(card) {
@@ -18,7 +19,8 @@ export function loadAgentsState() {
     }
     const overrides = raw.overrides && typeof raw.overrides === 'object' ? raw.overrides : {};
     const seq = Number.isInteger(raw.seq) && raw.seq >= 0 ? raw.seq : 0;
-    return { seq, created: raw.created.filter(validCard), overrides };
+    const deleted = Array.isArray(raw.deleted) ? raw.deleted.filter(isText) : [];
+    return { seq, created: raw.created.filter(validCard), overrides, deleted };
   } catch (error) {
     return EMPTY();
   }

@@ -62,6 +62,8 @@
   --p-status-warn-dark: #fbbf24;
   --p-status-crit-dark: #fb8585;
   --p-status-info-dark: #60a5fa;
+  --p-status-off-light: #475569;
+  --p-status-off-dark: #a7b5c9;
 
   /* Sombras */
   --p-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -191,6 +193,7 @@
   --color-status-warn: var(--p-status-warn-light);
   --color-status-crit: var(--p-status-crit-light);
   --color-status-info: var(--p-status-info-light);
+  --color-status-off: var(--p-status-off-light);
   --color-status-info-bg: color-mix(in srgb, var(--color-status-info) 10%, transparent);
   --color-status-ok-bg: color-mix(in srgb, var(--color-status-ok) 10%, transparent);
   --color-status-warn-bg: color-mix(in srgb, var(--color-status-warn) 12%, transparent);
@@ -254,6 +257,7 @@
   --color-status-warn: var(--p-status-warn-dark);
   --color-status-crit: var(--p-status-crit-dark);
   --color-status-info: var(--p-status-info-dark);
+  --color-status-off: var(--p-status-off-dark);
 
   --color-chart-grid: var(--p-slate-700);
   --color-chart-1: var(--p-green-500);
@@ -561,53 +565,66 @@
 }
 
 /* ── Botones (lenguaje del CTA "Solicita tu diagnostico gratuito" de la landing de Addon AI) ───
-   CTA de la landing: pildora (radio 999), degradado 135deg cian #0891b2 -> esmeralda #059669,
-   texto blanco 600, sin borde, hover con capa mas brillante (#06b6d4 -> #22c55e), elevacion de 2 px
-   y resplandor cian/esmeralda; secundario con borde y tinte cian. Esos tonos dan solo 3,68:1 y
-   3,77:1 con texto blanco, asi que se oscurecieron al minimo para llegar a AA (>= 4,5:1):
-   base #0e7490 -> #047857 (5,36:1 / 5,48:1) y hover #0b7f9e -> #06805b (4,62:1 / 4,95:1). */
+   Version ligera: pildora de 36 px (44 px en tactil), texto 500 de --font-size-sm, padding lateral de
+   16 px, degradado 135deg cian -> esmeralda, elevacion de 1 px, resplandor pequeno (0 2px 8px) y
+   secundario con borde de 1 px y tinte del 3 %. Texto blanco sobre el degradado >= 4,5:1 (AA):
+   base #0a7c9b -> #047d5a (4,81:1 / 5,14:1) y hover #0b809f -> #058560 (4,56:1 / 4,64:1). */
 
 /* Capa 1: primitive */
 :root {
-  --p-btn-cyan-base: #0e7490;
-  --p-btn-emerald-base: #047857;
-  --p-btn-cyan-hover: #0b7f9e;
-  --p-btn-emerald-hover: #06805b;
+  --p-btn-cyan-base: #0a7c9b;
+  --p-btn-emerald-base: #047d5a;
+  --p-btn-cyan-hover: #0b809f;
+  --p-btn-emerald-hover: #058560;
   --p-btn-cyan-text-light: #155e75;
   --p-btn-cyan-text-dark: #22d3ee;
-  --p-btn-glow-cyan: rgba(6, 182, 212, 0.3);
-  --p-btn-glow-emerald: rgba(16, 185, 129, 0.2);
+  --p-btn-glow-cyan: rgba(6, 182, 212, 0.22);
+  --p-btn-glow-emerald: rgba(16, 185, 129, 0.16);
   --p-btn-glow-cyan-soft: rgba(8, 145, 178, 0.14);
   --p-btn-glow-emerald-soft: rgba(5, 150, 105, 0.1);
-  --p-btn-tracking: -0.15px;
-  --p-btn-lift: -2px;
+  --p-btn-tracking: 0.1px;
+  --p-btn-lift: -1px;
 }
 
 /* Capa 3: component (claro por defecto) */
 :root {
   --btn-radius: var(--radius-full);
+  --btn-min-height: 36px;
+  --btn-pad-x: var(--space-4);
+  --btn-weight: var(--font-weight-medium);
+  --btn-font-size: var(--font-size-sm);
+  --btn-line-height: 1.25;
   --btn-tracking: var(--p-btn-tracking);
   --btn-lift: var(--p-btn-lift);
   --btn-primary-bg: linear-gradient(135deg, var(--p-btn-cyan-base), var(--p-btn-emerald-base));
   --btn-primary-bg-hover: linear-gradient(135deg, var(--p-btn-cyan-hover), var(--p-btn-emerald-hover));
   --btn-primary-text: var(--p-white);
-  --btn-primary-glow: 0 10px 40px var(--p-btn-glow-cyan-soft), 0 5px 15px var(--p-btn-glow-emerald-soft);
+  --btn-primary-shadow: 0 1px 3px var(--p-btn-glow-cyan-soft);
+  --btn-primary-glow: 0 2px 8px var(--p-btn-glow-cyan-soft), 0 1px 3px var(--p-btn-glow-emerald-soft);
   --btn-secondary-text: var(--p-btn-cyan-text-light);
-  --btn-secondary-border: color-mix(in srgb, var(--btn-secondary-text) 55%, transparent);
-  --btn-secondary-border-hover: color-mix(in srgb, var(--btn-secondary-text) 85%, transparent);
-  --btn-secondary-tint: color-mix(in srgb, var(--btn-secondary-text) 6%, transparent);
-  --btn-secondary-tint-hover: color-mix(in srgb, var(--btn-secondary-text) 10%, transparent);
-  --btn-secondary-glow: 0 8px 28px var(--p-btn-glow-cyan-soft);
+  --btn-secondary-border: color-mix(in srgb, var(--btn-secondary-text) 40%, transparent);
+  --btn-secondary-border-hover: color-mix(in srgb, var(--btn-secondary-text) 70%, transparent);
+  --btn-secondary-tint: color-mix(in srgb, var(--btn-secondary-text) 3%, transparent);
+  --btn-secondary-tint-hover: color-mix(in srgb, var(--btn-secondary-text) 8%, transparent);
+  --btn-secondary-glow: 0 1px 4px var(--p-btn-glow-cyan-soft);
   --btn-danger-text: var(--color-status-crit);
-  --btn-danger-border: color-mix(in srgb, var(--color-status-crit) 60%, transparent);
-  --btn-danger-tint: color-mix(in srgb, var(--color-status-crit) 6%, transparent);
-  --btn-danger-tint-hover: color-mix(in srgb, var(--color-status-crit) 10%, transparent);
-  --btn-danger-glow: 0 8px 28px color-mix(in srgb, var(--color-status-crit) 22%, transparent);
+  --btn-danger-border: color-mix(in srgb, var(--color-status-crit) 40%, transparent);
+  --btn-danger-tint: color-mix(in srgb, var(--color-status-crit) 3%, transparent);
+  --btn-danger-tint-hover: color-mix(in srgb, var(--color-status-crit) 8%, transparent);
+  --btn-danger-glow: 0 1px 4px color-mix(in srgb, var(--color-status-crit) 20%, transparent);
 }
 
 /* Capa 3: component (oscuro) */
 [data-theme='dark'] {
-  --btn-primary-glow: 0 10px 40px var(--p-btn-glow-cyan), 0 5px 15px var(--p-btn-glow-emerald);
+  --btn-primary-shadow: 0 1px 3px var(--p-btn-glow-cyan);
+  --btn-primary-glow: 0 2px 8px var(--p-btn-glow-cyan), 0 1px 3px var(--p-btn-glow-emerald);
   --btn-secondary-text: var(--p-btn-cyan-text-dark);
-  --btn-secondary-glow: 0 8px 28px var(--p-btn-glow-cyan);
+  --btn-secondary-glow: 0 1px 4px var(--p-btn-glow-cyan);
+}
+
+/* Tactil: los botones vuelven al objetivo de 44 px */
+@media (pointer: coarse) {
+  :root {
+    --btn-min-height: var(--tap-min);
+  }
 }

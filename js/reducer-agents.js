@@ -34,9 +34,9 @@ function agentsChanged(state, { id, name, notice }) {
   return notice ? withNotice(next, notice) : next;
 }
 
-function agentRemoved(state, { id, notice }) {
+function agentRemoved(state, { id, ids = [id], notice }) {
   let next = bump(state);
-  if (state.ui.agentId === id) {
+  if (ids.includes(state.ui.agentId)) {
     next = {
       ...next,
       graph: EMPTY_GRAPH,

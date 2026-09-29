@@ -18,7 +18,7 @@ export const SEED = [
     'activo', 'Andrés Salazar', 'organizacion', 3, 1200, 64, RECLAMOS),
   meta('cotizacion-fletes', 'Cotización de fletes',
     'Convierte una solicitud de transporte en una cotización clara en minutos.',
-    'en-revision', ME, 'personal', 5, 900, 71, COTIZACION),
+    'inactivo', ME, 'personal', 5, 900, 71, COTIZACION),
   meta('conciliacion-facturas', 'Conciliación de facturas de transporte',
     'Compara las facturas de los transportistas con las guías y señala diferencias.',
     'borrador', 'Laura Mejía', 'organizacion', 9, 2400, 58, CONCILIACION),
@@ -30,7 +30,7 @@ export const SEED = [
     'borrador', ME, 'personal', 0, 4200, 88, ALERTAS),
   meta('verificacion-aduanera', 'Verificación de documentos aduaneros',
     'Revisa que los documentos de exportación estén completos antes de radicarlos.',
-    'en-revision', 'Laura Mejía', 'organizacion', 14, 600, 49, ADUANA),
+    'inactivo', 'Laura Mejía', 'organizacion', 14, 600, 49, ADUANA),
 ];
 
 const AVATAR_OF = {

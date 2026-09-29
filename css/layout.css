@@ -118,13 +118,13 @@ body {
 .main-nav__btn[aria-current='page'] {
   color: var(--color-text-primary);
   background: var(--color-accent-soft);
-  box-shadow: inset 0 calc(var(--stroke-bold) * -1) 0 var(--color-accent);
+  box-shadow: inset 0 calc(var(--stroke-base) * -1) 0 var(--color-accent);
 }
 
 /* Boton de tema: muestra el icono del modo al que se cambia (luna en claro, sol en oscuro) */
 .theme-toggle {
-  min-width: var(--tap-min);
-  min-height: var(--tap-min);
+  min-width: var(--btn-min-height);
+  min-height: var(--btn-min-height);
 }
 
 .topbar__theme,
@@ -220,7 +220,7 @@ body[data-view='constructor'] .app-main {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-1) var(--space-3);
-  min-height: var(--tap-min);
+  min-height: calc(var(--btn-min-height) + var(--space-2));
   padding: var(--space-1) var(--content-padding);
   border-block-end: var(--border-width) solid var(--color-border);
   background: var(--color-bg-card);
