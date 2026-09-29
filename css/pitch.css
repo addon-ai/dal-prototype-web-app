@@ -288,25 +288,17 @@
   line-height: 0;
 }
 
-/* Logo oficial sin alterar: en tema oscuro va sobre una base clara para conservar sus colores de marca. */
+/* Logo oficial sin alterar. */
 .pitch__logo-img {
   display: block;
-  width: clamp(240px, 20vw + 110px, 430px);
+  width: clamp(280px, 22vw + 130px, 500px);
   height: auto;
-}
-
-[data-theme='dark'] .pitch__logo {
-  display: inline-block;
-  padding: 14px 18px;
-  border-radius: var(--radius-lg, 16px);
-  background: #fff;
-  line-height: 0;
 }
 
 .pitch__cover .pitch__lead {
   max-width: 52ch;
   margin-top: clamp(14px, 2.4vh, 24px);
-  font-size: clamp(0.9rem, 0.8rem + 0.3vw, 1.05rem);
+  font-size: clamp(1rem, 0.9rem + 0.45vw, 1.2rem);
   line-height: 1.55;
 }
 
