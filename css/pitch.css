@@ -283,26 +283,31 @@
   align-items: center;
 }
 
-.pitch__dal {
-  color: var(--color-text-primary);
-  font-family: var(--font-heading);
-  font-size: clamp(3.4rem, 1rem + 7.5vw, 8.5rem);
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.015em;
+.pitch__logo {
+  margin: 14px 0 0;
+  line-height: 0;
 }
 
-@supports (-webkit-text-stroke: 1px black) {
-  .pitch__dal {
-    color: transparent;
-    -webkit-text-stroke: 1.2px var(--color-text-primary);
-  }
+.pitch__logo-img {
+  display: block;
+  width: clamp(260px, 22vw + 120px, 460px);
+  height: auto;
+}
+
+.pitch__logo-img--dark,
+[data-theme='dark'] .pitch__logo-img--light {
+  display: none;
+}
+
+[data-theme='dark'] .pitch__logo-img--dark {
+  display: block;
 }
 
 .pitch__cover .pitch__lead {
-  max-width: 46ch;
-  margin-top: clamp(18px, 3vh, 30px);
-  font-size: clamp(1.05rem, 0.85rem + 0.7vw, 1.4rem);
+  max-width: 52ch;
+  margin-top: clamp(14px, 2.4vh, 24px);
+  font-size: clamp(0.9rem, 0.8rem + 0.3vw, 1.05rem);
+  line-height: 1.55;
 }
 
 .pitch__cover-meta {
