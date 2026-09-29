@@ -283,15 +283,15 @@
   align-items: center;
 }
 
-.pitch__logo {
-  margin: 14px 0 0;
+.view--pitch .pitch__logo {
+  margin: clamp(28px, 5vh, 48px) 0 0;
   line-height: 0;
 }
 
 /* Logo oficial sin alterar: en tema oscuro va sobre una base clara para conservar sus colores de marca. */
 .pitch__logo-img {
   display: block;
-  width: clamp(195px, 16.5vw + 90px, 345px);
+  width: clamp(240px, 20vw + 110px, 430px);
   height: auto;
 }
 
@@ -308,12 +308,6 @@
   margin-top: clamp(14px, 2.4vh, 24px);
   font-size: clamp(0.9rem, 0.8rem + 0.3vw, 1.05rem);
   line-height: 1.55;
-}
-
-.pitch__cover-meta {
-  margin-top: clamp(20px, 4vh, 40px);
-  color: var(--color-text-secondary);
-  font-size: 0.95rem;
 }
 
 .pitch__tower {
@@ -351,12 +345,6 @@
   border-radius: 50%;
   color: var(--color-text-primary);
   font-size: 0.78rem;
-}
-
-.pitch__hint {
-  margin-top: 12px;
-  color: var(--color-text-secondary);
-  font-size: 0.88rem;
 }
 
 /* ---------- 1 Cliente y problema ---------- */
