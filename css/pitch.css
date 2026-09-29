@@ -288,15 +288,19 @@
   line-height: 0;
 }
 
-.pitch__logo-svg {
-  --pitch-logo-ink: #163a65;
+/* Logo oficial sin alterar: en tema oscuro va sobre una base clara para conservar sus colores de marca. */
+.pitch__logo-img {
   display: block;
   width: clamp(195px, 16.5vw + 90px, 345px);
   height: auto;
 }
 
-[data-theme='dark'] .pitch__logo-svg {
-  --pitch-logo-ink: var(--color-text-primary);
+[data-theme='dark'] .pitch__logo {
+  display: inline-block;
+  padding: 14px 18px;
+  border-radius: var(--radius-lg, 16px);
+  background: #fff;
+  line-height: 0;
 }
 
 .pitch__cover .pitch__lead {
