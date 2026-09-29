@@ -313,7 +313,7 @@
 
 .pitch__tower {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   gap: 10px;
   justify-self: end;
   width: 100%;
