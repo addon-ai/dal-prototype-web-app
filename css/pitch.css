@@ -288,19 +288,15 @@
   line-height: 0;
 }
 
-.pitch__logo-img {
+.pitch__logo-svg {
+  --pitch-logo-ink: #163a65;
   display: block;
-  width: clamp(260px, 22vw + 120px, 460px);
+  width: clamp(195px, 16.5vw + 90px, 345px);
   height: auto;
 }
 
-.pitch__logo-img--dark,
-[data-theme='dark'] .pitch__logo-img--light {
-  display: none;
-}
-
-[data-theme='dark'] .pitch__logo-img--dark {
-  display: block;
+[data-theme='dark'] .pitch__logo-svg {
+  --pitch-logo-ink: var(--color-text-primary);
 }
 
 .pitch__cover .pitch__lead {
