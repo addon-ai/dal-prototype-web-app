@@ -9,7 +9,7 @@ const NEEDS_AGENT = ['constructor', 'resultados'];
 
 export function parseHash(hash) {
   const [, view = '', id = ''] = /^#\/([a-z]+)(?:\/([\w-]+))?(?:\?.*)?$/.exec(hash) ?? [];
-  return VIEWS.includes(view) ? { view, id } : { view: 'pitch', id: '' };
+  return VIEWS.includes(view) ? { view, id } : { view: 'agentes', id: '' };
 }
 
 // La vista Agentes puede llevar filtros en el hash (#/agentes?estado=activo); los aporta su modulo.

@@ -32,6 +32,7 @@ import { mountStats } from './ui/stats.js';
 import { mountCosts } from './ui/costs.js';
 import { mountAgents } from './ui/agents.js';
 import { mountAccount } from './ui/account.js';
+import { mountPitch } from './ui/pitch.js';
 import { mountBuilderHead } from './ui/builder-head.js';
 import { mountViews } from './views.js';
 import { mountHashSync, goTo, parseHash, clearHash, syncQuery } from './navigation.js';
@@ -116,6 +117,7 @@ mountAgents(
   () => syncQuery(store, () => session.active),
 );
 mountAccount();
+mountPitch(document.getElementById('view-pitch'), store);
 mountDotField();
 
 // Borrador por agente: se guarda 500 ms despues del ultimo cambio; sin localStorage, se ignora.
@@ -151,9 +153,9 @@ mountLogin({
   },
   onLeave: () => {
     session.active = false;
-    requested.view = 'pitch';
+    requested.view = 'agentes';
     requested.id = '';
     clearHash();
-    store.dispatch({ type: 'SET_VIEW', view: 'pitch' });
+    store.dispatch({ type: 'SET_VIEW', view: 'agentes' });
   },
 });

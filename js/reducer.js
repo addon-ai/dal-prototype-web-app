@@ -19,7 +19,7 @@ export function createInitialState(graph = cloneTemplateGraph()) {
     ui: {
       selectedId: null,
       connectFrom: null,
-      view: 'pitch',
+      view: 'agentes',
       agentId: null,
       notice: null,
       noticeSeq: 0,
