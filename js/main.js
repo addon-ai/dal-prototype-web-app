@@ -151,9 +151,9 @@ mountLogin({
   },
   onLeave: () => {
     session.active = false;
-    requested.view = 'agentes';
+    requested.view = 'pitch';
     requested.id = '';
     clearHash();
-    store.dispatch({ type: 'SET_VIEW', view: 'agentes' });
+    store.dispatch({ type: 'SET_VIEW', view: 'pitch' });
   },
 });

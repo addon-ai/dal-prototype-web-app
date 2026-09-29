@@ -1,15 +1,15 @@
-// Navegacion por hash (#/agentes, #/constructor/:id, #/resultados/:id). Solo hash, sin red.
+// Navegacion por hash (#/pitch, #/agentes, #/constructor/:id, #/resultados/:id). Solo hash, sin red.
 // El store es la fuente de verdad: la vista y el agente activos se reflejan en el hash y viceversa.
 import { getAgent, cloneAgentGraph } from './data/agents/index.js';
 import { getDraft } from './draft-storage.js';
 import { isValidDraft } from './draft-valid.js';
 
-export const VIEWS = ['agentes', 'constructor', 'resultados'];
+export const VIEWS = ['pitch', 'agentes', 'constructor', 'resultados'];
 const NEEDS_AGENT = ['constructor', 'resultados'];
 
 export function parseHash(hash) {
   const [, view = '', id = ''] = /^#\/([a-z]+)(?:\/([\w-]+))?(?:\?.*)?$/.exec(hash) ?? [];
-  return VIEWS.includes(view) ? { view, id } : { view: 'agentes', id: '' };
+  return VIEWS.includes(view) ? { view, id } : { view: 'pitch', id: '' };
 }
 
 // La vista Agentes puede llevar filtros en el hash (#/agentes?estado=activo); los aporta su modulo.

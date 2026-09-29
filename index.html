@@ -56,6 +56,7 @@
     <link rel="stylesheet" href="./css/glass.css" />
     <link rel="stylesheet" href="./css/login.css" />
     <link rel="stylesheet" href="./css/backdrop.css" />
+    <link rel="stylesheet" href="./css/pitch.css" />
   </head>
   <body>
     <div
@@ -136,7 +137,10 @@
       <nav class="main-nav" aria-label="Secciones">
         <ul class="main-nav__list">
           <li>
-            <button type="button" class="main-nav__btn" data-view="agentes" aria-current="page">
+            <button type="button" class="main-nav__btn" data-view="pitch" aria-current="page">Pitch</button>
+          </li>
+          <li>
+            <button type="button" class="main-nav__btn" data-view="agentes">
               Agentes
             </button>
           </li>
@@ -184,7 +188,200 @@
     </header>
 
     <main id="main" class="app-main">
-      <section id="view-agentes" class="view view--page view--agents" aria-labelledby="agentes-title">
+      <section id="view-pitch" class="view view--page view--pitch" aria-labelledby="pitch-title">
+        <header class="pitch__hero">
+          <p class="pitch__kicker">Pitch YSA 2026</p>
+          <h1 id="pitch-title" class="pitch__title" tabindex="-1">DAL</h1>
+          <p class="pitch__lead">
+            Plataforma de Desarrollo de Agentes para el clúster logístico del Caribe colombiano.
+          </p>
+          <p class="pitch__meta">Addon.ai</p>
+          <ol class="pitch__steps" aria-label="Estructura del pitch">
+            <li><span class="pitch__num" aria-hidden="true">1</span>Cliente y problema</li>
+            <li><span class="pitch__num" aria-hidden="true">2</span>Evidencia</li>
+            <li><span class="pitch__num" aria-hidden="true">3</span>Solución</li>
+            <li><span class="pitch__num" aria-hidden="true">4</span>Monetización</li>
+            <li><span class="pitch__num" aria-hidden="true">5</span>Aporte de YSA</li>
+          </ol>
+        </header>
+
+        <section class="pitch__section" aria-labelledby="pitch-s1">
+          <p class="pitch__step"><span class="pitch__num" aria-hidden="true">1</span>Cliente y problema</p>
+          <p class="pitch__kicker">Puerto de Cartagena, 6:00 a. m.</p>
+          <h2 id="pitch-s1" class="pitch__h2">El problema no es la falta de datos.</h2>
+          <p class="pitch__lead">
+            Es que la información llega tarde, desincronizada y pensada solo para operar, no para decidir.
+          </p>
+          <div class="pitch__grid pitch__grid--3">
+            <div class="panel pitch__wait">
+              <svg class="icon pitch__ico" viewBox="0 0 52 36" aria-hidden="true" focusable="false"><rect x="3" y="6" width="46" height="24" rx="2" /><path d="M11 10v16M17 10v16M23 10v16M29 10v16M35 10v16M41 10v16" /></svg>
+              <p>Un contenedor espera su liberación</p>
+            </div>
+            <div class="panel pitch__wait">
+              <svg class="icon pitch__ico" viewBox="0 0 52 36" aria-hidden="true" focusable="false"><rect x="3" y="8" width="29" height="18" rx="2" /><path d="M32 13h8l7 7v6H32z" /><circle cx="12" cy="28" r="3.5" /><circle cx="39" cy="28" r="3.5" /></svg>
+              <p>Un camión espera turno</p>
+            </div>
+            <div class="panel pitch__wait">
+              <svg class="icon pitch__ico" viewBox="0 0 52 36" aria-hidden="true" focusable="false"><path d="M16 3h15l8 8v22H16z" /><path d="M31 3v8h8M20 17h15M20 22h15M20 27h10" /></svg>
+              <p>La agencia de aduanas espera un documento que nadie ha enviado</p>
+            </div>
+          </div>
+          <div class="panel pitch__client">
+            <h3>Nuestros clientes</h3>
+            <p>
+              Agencias de aduanas y empresas de transporte: los operadores del clúster logístico del Caribe colombiano.
+            </p>
+          </div>
+        </section>
+
+        <section class="pitch__section" aria-labelledby="pitch-s2">
+          <p class="pitch__step"><span class="pitch__num" aria-hidden="true">2</span>Evidencia</p>
+          <h2 id="pitch-s2" class="pitch__h2">Ese desfase tiene un costo medible.</h2>
+          <div class="pitch__cols">
+            <div class="pitch__group">
+              <h3>Costo operativo</h3>
+              <div class="kpi"><span class="pitch__fig">15–25%</span><p>de sobrecosto por unidad movilizada al operar con datos desactualizados.</p></div>
+              <div class="kpi"><span class="pitch__fig">$8 <small>millones</small></span><p>de pesos al mes en digitación manual.</p></div>
+            </div>
+            <div class="pitch__group pitch__group--wide">
+              <h3>Riesgo sancionatorio</h3>
+              <div class="pitch__grid pitch__grid--2">
+                <div class="kpi"><span class="pitch__fig">2.716</span><p>investigaciones de la Superintendencia de Transporte entre enero y septiembre de 2025.</p></div>
+                <div class="kpi"><span class="pitch__fig">$6.061 <small>millones</small></span><p>de pesos en multas impuestas en ese mismo periodo.</p></div>
+                <div class="kpi"><span class="pitch__fig">258</span><p>investigaciones a empresas de carga por incumplimientos del SICE-TAC.</p></div>
+                <div class="kpi"><span class="pitch__fig">100–1.000 <small>UVT</small></span><p>en sanciones de la DIAN por inconsistencias en manifiestos, con riesgo de inmovilizar la carga.</p></div>
+              </div>
+            </div>
+            <div class="pitch__group">
+              <h3>Frente al cliente final</h3>
+              <div class="kpi"><span class="pitch__fig"><small>USD</small> 5.000–50.000</span><p>en penalidades por cada retraso imprevisto.</p></div>
+            </div>
+          </div>
+          <p class="pitch__source">Cifras regulatorias: Superintendencia de Transporte (2024 y 2025) y DIAN.</p>
+        </section>
+
+        <section class="pitch__section" aria-labelledby="pitch-s3">
+          <p class="pitch__contrast">
+            <span class="pitch__ring" aria-hidden="true">71%</span>
+            La tecnología tradicional no ha resuelto esto: el 71% de los proyectos de IA del sector fracasa por falta de ejecución confiable.
+          </p>
+          <div class="pitch__split">
+            <div class="pitch__stack">
+              <p class="pitch__step"><span class="pitch__num" aria-hidden="true">3</span>Solución</p>
+              <h2 id="pitch-s3" class="pitch__h2">Por eso creamos DAL.</h2>
+              <p class="pitch__lead">
+                Nuestra Plataforma de Desarrollo de Agentes se conecta a los sistemas que el cliente ya tiene, sin reemplazarlos, y despliega agentes de IA que trabajan dentro de la operación.
+              </p>
+              <div class="pitch__metric">
+                <span class="pitch__big">&lt; 15 min</span>
+                <p>La información deja de llegar con días de atraso y se actualiza en menos de 15 minutos.</p>
+              </div>
+              <blockquote class="pitch__quote">
+                No entregamos tableros que muestran lo que ya pasó: entregamos agentes que actúan mientras pasa.
+              </blockquote>
+              <p class="tag pitch__status"><span class="pitch__pulse" aria-hidden="true"></span>Hoy validamos DAL con Serpomar, en Cartagena, como paso previo a la salida al mercado.</p>
+            </div>
+            <div class="pitch__build">
+              <div class="pitch__layer">
+                <p class="pitch__cap">Tus sistemas, sin reemplazarlos</p>
+                <div class="pitch__grid pitch__grid--4">
+                  <div class="panel pitch__chip"><b>ERP</b></div>
+                  <div class="panel pitch__chip"><b>GPS</b></div>
+                  <div class="panel pitch__chip"><b>Básculas</b></div>
+                  <div class="panel pitch__chip"><b>Documentos</b></div>
+                </div>
+              </div>
+              <div class="pitch__core">
+                <span class="pitch__core-name">DAL</span>
+                <span>Plataforma de Desarrollo de Agentes</span>
+              </div>
+              <div class="pitch__grid pitch__grid--3">
+                <div class="panel"><b>Agente de manifiestos</b><p>Valida cada manifiesto antes de que la carga se mueva.</p></div>
+                <div class="panel"><b>Agente de anticipación</b><p>Anticipa retrasos con 4 a 12 horas de ventaja.</p></div>
+                <div class="panel"><b>Agente de cumplimiento</b><p>Vigila el cumplimiento regulatorio.</p></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="pitch__section" aria-labelledby="pitch-s4">
+          <p class="pitch__step"><span class="pitch__num" aria-hidden="true">4</span>Monetización y escalabilidad</p>
+          <h2 id="pitch-s4" class="pitch__h2">Monetizamos con un modelo híbrido de dos capas.</h2>
+          <div class="pitch__cols pitch__cols--money">
+            <div class="pitch__group">
+              <p class="pitch__cap">Capa 1</p>
+              <h3>Discovery y diseño</h3>
+              <div class="panel">
+                <b>Blueprint Engine</b>
+                <p>Levantamos y diseñamos el proceso agéntico de cada cliente, y lo cobramos por horas de ingeniería.</p>
+                <span class="pitch__fig pitch__fig--accent"><small>USD</small> 8.000–15.000</span>
+              </div>
+            </div>
+            <div class="pitch__group">
+              <p class="pitch__cap">Capa 2</p>
+              <h3>Suscripción a la aplicación núcleo</h3>
+              <p class="pitch__small">Un SaaS que cobra por uso:</p>
+              <div class="pitch__grid pitch__grid--2">
+                <div class="panel"><b>Ejecuciones de agentes en producción</b></div>
+                <div class="panel"><b>Bases de conocimiento RAG</b></div>
+                <div class="panel"><b>Tokens de entrada y salida por modelo</b></div>
+                <div class="panel"><b>Procesamiento de documentos</b></div>
+              </div>
+            </div>
+            <div class="pitch__group">
+              <p class="pitch__cap">Proyección</p>
+              <h3>Ingresos recurrentes</h3>
+              <div class="panel">
+                <span class="pitch__fig pitch__fig--accent"><small>USD</small> 5.000–50.000</span>
+                <p>al mes por cuenta industrial.</p>
+                <hr class="pitch__sep" />
+                <span class="pitch__fig pitch__fig--accent">&gt; 70%</span>
+                <p>de margen operativo.</p>
+              </div>
+            </div>
+          </div>
+          <div class="pitch__market">
+            <div class="pitch__minis" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <p>
+              <b>Marketplace de microservicios reutilizables.</b> Cada agente que construimos se suma al marketplace y hace cada nueva implementación más rápida y más rentable.
+            </p>
+          </div>
+        </section>
+
+        <section class="pitch__section" aria-labelledby="pitch-s5">
+          <p class="pitch__step"><span class="pitch__num" aria-hidden="true">5</span>Aporte de YSA</p>
+          <h2 id="pitch-s5" class="pitch__h2">El programa YSA fue determinante.</h2>
+          <div class="pitch__shift">
+            <div class="panel">
+              <p class="pitch__cap">Antes</p>
+              <b>Consultora técnica tradicional</b>
+            </div>
+            <svg class="icon pitch__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            <div class="panel pitch__panel--accent">
+              <p class="pitch__cap">Hoy</p>
+              <b>Modelo SaaS escalable por uso de agentes</b>
+            </div>
+          </div>
+          <div class="pitch__grid pitch__grid--2">
+            <div class="panel pitch__win">
+              <svg class="icon pitch__chk" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="10" /><path d="M6.5 11.5l3 3 6-6.5" /></svg>
+              <p>Garantía de resultados con devolución del 20% de la inversión.</p>
+            </div>
+            <div class="panel pitch__win">
+              <svg class="icon pitch__chk" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="10" /><path d="M6.5 11.5l3 3 6-6.5" /></svg>
+              <p>Modelo financiero para el ecosistema portuario del Caribe.</p>
+            </div>
+          </div>
+          <p class="pitch__closing">
+            Con la Cámara de Comercio de Santa Marta e ITC como aliados, DAL será el motor que transforme la logística de nuestra región.
+          </p>
+          <p class="pitch__thanks">Muchas gracias.</p>
+        </section>
+      </section>
+
+      <section id="view-agentes" class="view view--page view--agents" aria-labelledby="agentes-title" hidden>
         <h1 id="agentes-title" tabindex="-1">Agentes</h1>
         <div id="agents-root"></div>
       </section>

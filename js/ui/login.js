@@ -1,5 +1,5 @@
 // Pantalla de inicio de sesion de DEMOSTRACION. No valida, no envia, no guarda ni registra
-// ninguna credencial: cualquier entrada (incluso vacia) lleva siempre a la coleccion de agentes.
+// ninguna credencial: cualquier entrada (incluso vacia) lleva siempre al Pitch (vista inicial).
 const LEAVE_MS = 400;
 
 function prefersReducedMotion() {
@@ -26,7 +26,7 @@ export function mountLogin({ login, shell, form, logoutButton, store, onEnter, o
     shell.inert = false;
     store.dispatch({ type: 'SIM_STOP', silent: true });
     onEnter();
-    announce('Sesión de demostración iniciada. Estás en Agentes.');
+    announce('Sesión de demostración iniciada. Estás en el Pitch.');
     if (prefersReducedMotion()) {
       finishLeave();
       return;
