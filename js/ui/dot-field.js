@@ -36,6 +36,7 @@ export function mountDotField() {
   }
 
   function resize() {
+    if (!canvas || !ctx) return;
     const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
     canvas.width = Math.round(window.innerWidth * dpr);
     canvas.height = Math.round(window.innerHeight * dpr);

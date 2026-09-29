@@ -1,16 +1,12 @@
 /* Vista de agentes: barra de filtros (alcance, estado, busqueda), seleccion multiple, casilla de
    tarjeta y estados vacios. Solo tokens. */
 
-.agents__toolbar {
-  display: grid;
-  gap: var(--space-2);
-}
-
 .agents__bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2) var(--space-3);
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
 }
 
 .agents__filters {
@@ -19,16 +15,20 @@
   gap: var(--space-2);
 }
 
-.agents__label {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+/* Buscador compacto + estado + orden, agrupados a la derecha; en movil hacen wrap */
+.agents__controls {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
 }
 
 .agents__search {
   position: relative;
-  flex: 1 1 14rem;
-  min-width: 0;
+  flex: 0 1 18.75rem;
+  width: 18.75rem;
+  min-width: 12.5rem;
 }
 
 .agents__search .select {
@@ -47,8 +47,32 @@
   border-color: transparent;
 }
 
-.agents__bar > .select {
+.agents__controls > .select {
+  flex: 0 0 auto;
   width: auto;
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  .agents__controls {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+  }
+
+  .agents__search {
+    flex: 1 1 100%;
+  }
+
+  .agents__controls > .select {
+    flex: 1 1 calc(50% - var(--space-1));
+    min-width: 0;
+  }
+}
+
+@media (max-width: 479px) {
+  .agents__controls > .select {
+    flex-basis: 100%;
+  }
 }
 
 /* Barra de seleccion: "Seleccionar todos", contador, limpiar y un solo "Eliminar" */

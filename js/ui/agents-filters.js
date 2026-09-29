@@ -75,6 +75,20 @@ function chipGroup(label, options, get, set) {
   return { group, paint };
 }
 
+// Desplegable nativo (teclado y tactil del sistema); `options` = [[valor, texto], ...].
+function selectControl(label, options, set) {
+  const select = document.createElement('select');
+  select.className = 'select agents__select-control';
+  select.setAttribute('aria-label', label);
+  options.forEach(([value, text]) => {
+    const option = h('option', '', text);
+    option.value = value;
+    select.append(option);
+  });
+  select.addEventListener('change', () => set(select.value));
+  return { select };
+}
+
 function searchBox(f, onChange) {
   const box = h('div', 'agents__search');
   const input = document.createElement('input');
@@ -118,34 +132,29 @@ export function createFilterBar(f, onChange) {
     onChange();
   };
   const scopes = chipGroup('Filtrar por alcance', SCOPES, () => f.scope, pick('scope'));
-  const estados = chipGroup('Filtrar por estado', ESTADOS, () => f.estado, pick('estado'));
   const search = searchBox(f, onChange);
-  const sort = document.createElement('select');
-  sort.className = 'select';
-  sort.setAttribute('aria-label', 'Ordenar agentes');
-  SORTS.forEach(([value, label]) => {
-    const option = h('option', '', label);
-    option.value = value;
-    sort.append(option);
-  });
-  sort.addEventListener('change', () => pick('sort')(sort.value));
-  const top = h('div', 'agents__bar');
-  top.append(scopes.group, search.box, sort);
-  const row = h('div', 'agents__bar agents__bar--estado');
-  row.append(h('span', 'agents__label', 'Estado'), estados.group);
-  const el = h('div', 'agents__toolbar');
-  el.append(top, row);
+  const estado = selectControl('Filtrar por estado', ESTADOS, pick('estado'));
+  const sort = selectControl('Ordenar por', SORTS, pick('sort'));
+  const controls = h('div', 'agents__controls');
+  controls.append(search.box, estado.select, sort.select);
+  const el = h('div', 'agents__bar');
+  el.append(scopes.group, controls);
   return {
     el,
     sync: () => {
       search.sync();
-      sort.value = f.sort;
+      estado.select.value = f.estado;
+      sort.select.value = f.sort;
     },
     paint: (all) => {
       const byScope = filterAgents(all, f, 'scope');
       const byEstado = filterAgents(all, f, 'estado');
       scopes.paint(Object.fromEntries(SCOPES.map(([id, , test]) => [id, byScope.filter(test).length])));
-      estados.paint(Object.fromEntries(ESTADOS.map(([id]) => [id, byEstado.filter((a) => id === 'todos' || a.status === id).length])));
+      estado.select.value = f.estado;
+      [...estado.select.options].forEach((option) => {
+        const id = option.value;
+        option.textContent = `${id === 'todos' ? 'Todos los estados' : STATUS[id].label} (${byEstado.filter((a) => id === 'todos' || a.status === id).length})`;
+      });
     },
   };
 }

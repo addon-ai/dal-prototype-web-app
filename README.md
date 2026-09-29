@@ -28,8 +28,8 @@ de la receta. Los tokens (`css/tokens.css`) siguen la app DAL con contraste AA (
 ## Agentes, cuenta y rutas
 
 - **Agentes** (`#/agentes`): colección mock de 7 agentes de logística (`js/data/agents/`), con filtros
-  de alcance (Todos/Míos/De mi organización), de estado (Borrador/Activo/Inactivo, con conteos que respetan
-  alcance y búsqueda), búsqueda de texto (nombre, descripción, propietario y estado; `type=search`, botón limpiar,
+  de alcance (Todos/Míos/De mi organización), de estado (desplegable junto al orden: Todos/Borrador/Activo/Inactivo, con conteos que respetan
+  alcance y búsqueda), búsqueda de texto compacta (nombre, descripción, propietario y estado; `type=search`, botón limpiar,
   debounce 200 ms), orden y tarjeta "Nuevo agente". Los filtros se combinan (AND) y viajan en el hash
   (`#/agentes?alcance=mios&estado=activo&q=texto`). Cada agente tiene su grafo,
   receta, resultados y costos; el borrador se guarda por agente (`dal-proto-draft-v2:<id>`).
