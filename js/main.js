@@ -139,7 +139,7 @@ store.subscribe(
 // Efecto cristal y sesion de demostracion (el login se muestra en cada carga).
 initGlassToggle(document.getElementById('glass-toggle'));
 const requested = parseHash(window.location.hash);
-mountLogin({
+const auth = mountLogin({
   login: document.getElementById('login'),
   shell: document.getElementById('app-shell'),
   form: document.getElementById('login-form'),
@@ -159,3 +159,9 @@ mountLogin({
     store.dispatch({ type: 'SET_VIEW', view: 'agentes' });
   },
 });
+
+// Acceso directo al pitch (#/pitch): entra sin pedir inicio de sesion. Al cerrar sesion, el login vuelve a mostrarse.
+if (document.documentElement.hasAttribute('data-open-pitch')) {
+  document.documentElement.removeAttribute('data-open-pitch');
+  auth.enter(true);
+}

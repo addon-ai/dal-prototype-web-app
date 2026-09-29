@@ -291,7 +291,8 @@
 /* Logo oficial sin alterar. */
 .pitch__logo-img {
   display: block;
-  width: clamp(280px, 22vw + 130px, 500px);
+  width: 100%;
+  max-width: 80%;
   height: auto;
 }
 

@@ -9,6 +9,10 @@
   visibility: hidden;
 }
 
+:root[data-open-pitch] .login {
+  display: none;
+}
+
 .login {
   position: fixed;
   inset: 0;

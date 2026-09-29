@@ -28,6 +28,10 @@
           /* localStorage no disponible: se usa la preferencia del sistema y cristal activado. */
         }
         root.setAttribute('data-theme', theme);
+        // Acceso directo al pitch (#/pitch): sin pantalla de inicio de sesion, sin parpadeo.
+        if (/^#\/pitch(\?|$)/.test(window.location.hash)) {
+          root.setAttribute('data-open-pitch', '');
+        }
         root.setAttribute('data-glass', glass);
         var meta = document.querySelector('meta[name="theme-color"]');
         if (meta) {

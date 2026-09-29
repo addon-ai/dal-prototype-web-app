@@ -20,14 +20,16 @@ export function mountLogin({ login, shell, form, logoutButton, store, onEnter, o
     login.classList.remove('login--leaving');
   }
 
-  function enter() {
+  function enter(instant = false) {
     // Los campos se vacian: nada de lo escrito queda en el DOM ni en ningun almacenamiento.
     form.reset();
     shell.inert = false;
     store.dispatch({ type: 'SIM_STOP', silent: true });
     onEnter();
-    announce('Sesión de demostración iniciada. Estás en Agentes.');
-    if (prefersReducedMotion()) {
+    if (!instant) {
+      announce('Sesión de demostración iniciada. Estás en Agentes.');
+    }
+    if (instant || prefersReducedMotion()) {
       finishLeave();
       return;
     }
@@ -56,4 +58,5 @@ export function mountLogin({ login, shell, form, logoutButton, store, onEnter, o
     event.preventDefault();
   });
   logoutButton.addEventListener('click', signOut);
+  return { enter };
 }
