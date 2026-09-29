@@ -3,6 +3,7 @@
 import { cloneTemplateGraph } from '../template-logistica.js';
 import { pickAvatarId, getAvatar } from '../avatars.js';
 import { loadAgentsState, saveAgentsState } from '../../agents-storage.js';
+import { getDraft } from '../../draft-storage.js';
 import { ME } from './owner.js';
 import { SEED } from './seed.js';
 import { isStatus } from './status-ids.js';
@@ -68,12 +69,22 @@ function withOverride(agent) {
   return { ...agent, name, avatarId, status };
 }
 
-export function listAgents() {
+function allAgents() {
   return [...created, ...SEED.filter((agent) => !deleted.has(agent.id)).map(withOverride)];
 }
 
+// Un agente propio en blanco solo aparece en la coleccion cuando ya tiene pasos guardados como borrador.
+function hasData(agent) {
+  return !agent.user || agent.fromTemplate || (getDraft(agent.id)?.nodes?.length ?? 0) > 0;
+}
+
+export function listAgents() {
+  return allAgents().filter(hasData);
+}
+
+// Abrir un agente por id sigue funcionando aunque aun este en blanco (recien creado).
 export function getAgent(id) {
-  return listAgents().find((agent) => agent.id === id) ?? null;
+  return allAgents().find((agent) => agent.id === id) ?? null;
 }
 
 // Copia editable del grafo original del agente ("Restaurar plantilla").
