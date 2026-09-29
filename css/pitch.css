@@ -292,8 +292,8 @@
   letter-spacing: -0.015em;
 }
 
-@supports (-webkit-text-stroke: 1px black) {
-  .pitch__dal,
+  .pitch__dal {
+    color: transparent;
   .pitch__dal {
     -webkit-text-stroke: 1.2px var(--color-text-primary);
   }
