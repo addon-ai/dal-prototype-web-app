@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DAL, pitch YSA 2026 | Addon.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  /* Paleta Addon AI adaptada a modo oscuro. Cambia aquí los valores exactos de la marca. */
+  --ink:#07131F;
+  --deck:#0C1D2E;
+  --addon:#2E75B6;
+  --addon-deep:#1F4E79;
+  --addon-lit:#79AEE0;
+  --ice:#D9E2F3;
+  --text:#EEF3FA;
+  --mist:#8FA6C1;
+  --line:rgba(143,166,193,.24);
+  --brick-line:rgba(46,117,182,.68);
+  --container:#E8833A;
+  --container-line:rgba(232,131,58,.58);
+  --bar-h:64px;
+  --font:"Archivo","Helvetica Neue",Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ink:#07131F;--deck:#0C1D2E}}
+:root[data-theme="dark"]{--ink:#07131F;--deck:#0C1D2E}
+
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;background:var(--ink);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;height:100%;display:grid;grid-template-rows:minmax(0,1fr) auto;
+  background:var(--ink);color:var(--text);font-family:var(--font);
+  font-size:clamp(1rem,.9rem + .35vw,1.125rem);line-height:1.5;
+  overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+/* Placa base: retícula de "studs" en trazo fino */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle at 12px 12px,transparent 0 3.5px,rgba(46,117,182,.17) 3.5px 4.5px,transparent 5px);
+  background-size:24px 24px;
+  -webkit-mask-image:radial-gradient(120% 95% at 80% 25%,#000 0%,rgba(0,0,0,.35) 45%,transparent 80%);
+          mask-image:radial-gradient(120% 95% at 80% 25%,#000 0%,rgba(0,0,0,.35) 45%,transparent 80%);
+}
+h1,h2,h3,p{margin:0}
+button{font:inherit}
+
+/* ---------- Escenas ---------- */
+.deck{position:relative;z-index:1;min-height:0}
+.scene{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding:clamp(28px,5.5vh,64px) clamp(20px,5.5vw,96px) clamp(24px,4vh,44px);
+  opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s;
+}
+.scene.is-active{opacity:1;visibility:visible;transition:opacity .45s ease}
+.inner{max-width:1400px;min-height:100%;margin:0 auto;display:grid;gap:clamp(20px,3.2vw,52px);align-content:center}
+
+/* ---------- Tipografía ---------- */
+.step{display:flex;align-items:center;gap:12px;color:var(--mist);font-size:.95rem;margin-bottom:clamp(12px,2vh,20px)}
+.step-n{flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--brick-line);display:grid;place-items:center;color:var(--ice);font-size:.82rem;font-weight:600;font-stretch:115%;font-variant-numeric:tabular-nums}
+.kicker{color:var(--addon-lit);font-size:1rem;font-weight:500;margin-bottom:10px}
+.h2{font-size:clamp(1.9rem,1.1rem + 2.5vw,3.25rem);font-weight:620;font-stretch:108%;line-height:1.06;letter-spacing:-.012em;max-width:30ch;text-wrap:balance}
+.lead{font-size:clamp(1.08rem,.9rem + .65vw,1.38rem);color:var(--ice);line-height:1.45;max-width:42ch;margin-top:clamp(12px,2vh,20px)}
+.small{font-size:.92rem;color:var(--mist);line-height:1.5}
+.fig{display:block;font-weight:700;font-stretch:125%;font-size:clamp(1.55rem,1rem + 1.5vw,2.45rem);line-height:1.02;letter-spacing:-.01em;color:var(--container);font-variant-numeric:lining-nums tabular-nums}
+.fig--long{font-size:clamp(1.3rem,.85rem + 1.05vw,1.9rem)}
+.fig--blue{color:var(--addon-lit)}
+.fig small{font-size:.48em;font-weight:600;letter-spacing:0;margin-left:.3em;font-stretch:100%}
+.fig small.pre{margin:0 .35em 0 0}
+
+/* ---------- Ladrillos ---------- */
+.brick{
+  --fill:var(--deck);--bl:var(--brick-line);
+  position:relative;background:var(--fill);border:1px solid var(--bl);border-radius:10px;
+  padding:clamp(14px,1.3vw,20px) clamp(14px,1.4vw,22px);margin-top:7px;
+}
+.brick::before{
+  content:"";position:absolute;left:12px;right:12px;top:-6.5px;height:12px;pointer-events:none;
+  background-image:radial-gradient(circle at 9px 6px,var(--fill) 0 4.2px,var(--bl) 4.2px 5.2px,transparent 5.7px);
+  background-size:30px 12px;background-repeat:space no-repeat;
+}
+.brick--solid{--fill:var(--addon-deep);--bl:var(--addon)}
+.brick--warm{--bl:var(--container-line)}
+.brick--dash{border-style:dashed}
+.brick b{display:block;font-weight:600;color:var(--text);font-size:1.02rem;line-height:1.3}
+.brick p{color:var(--mist);font-size:.92rem;line-height:1.45;margin-top:6px}
+
+/* ---------- Animación de ensamblaje ---------- */
+.brick,.fade{opacity:0}
+.is-built .brick{
+  animation:snap .62s cubic-bezier(.2,.85,.25,1) both,click .7s ease-out both;
+  animation-delay:calc(var(--i,0) * 90ms + 160ms),calc(var(--i,0) * 90ms + 490ms);
+}
+.is-built .fade{animation:fade .7s ease both;animation-delay:calc(var(--d,0) * 1ms + 40ms)}
+@keyframes snap{
+  0%{opacity:0;transform:translate(var(--dx,0px),-64px) rotate(calc(var(--r,0deg) * 4))}
+  55%{opacity:1;transform:translate(0,3px) rotate(var(--r,0deg)) scale(1.012,.97)}
+  78%{transform:translate(0,-1.5px) rotate(var(--r,0deg)) scale(1,1)}
+  100%{opacity:1;transform:translate(0,0) rotate(var(--r,0deg))}
+}
+@keyframes click{
+  0%{box-shadow:0 0 0 0 rgba(121,174,224,0)}
+  35%{box-shadow:0 0 0 4px rgba(121,174,224,.16)}
+  100%{box-shadow:0 0 0 12px rgba(121,174,224,0)}
+}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* ---------- Portada ---------- */
+.cover{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);align-items:center}
+.dal{font-size:clamp(5.5rem,2rem + 12vw,13rem);font-weight:800;font-stretch:125%;line-height:.82;letter-spacing:-.015em;color:var(--text)}
+@supports (-webkit-text-stroke:1px black){
+  .dal,.thanks{color:transparent;-webkit-text-stroke:1.2px var(--ice)}
+}
+.cover .lead{max-width:30ch;font-size:clamp(1.2rem,.9rem + 1vw,1.7rem);margin-top:clamp(18px,3vh,30px)}
+.cover-meta{margin-top:clamp(20px,4vh,40px);color:var(--mist);font-size:.95rem}
+.tower{display:flex;flex-direction:column-reverse;gap:10px;width:100%;max-width:440px;justify-self:end}
+.tower .brick{display:flex;align-items:center;gap:14px;color:var(--ice);font-weight:500}
+.tower .brick:nth-child(odd){margin-right:14%}
+.tower .brick:nth-child(even){margin-left:14%}
+.tn{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--bl);display:grid;place-items:center;font-size:.78rem;color:var(--ice);font-stretch:115%}
+.hint{color:var(--mist);font-size:.88rem;margin-top:12px}
+
+/* ---------- 1 Cliente y problema ---------- */
+.split{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center}
+.waits{display:grid;gap:24px;padding-top:8px}
+.waits .brick:nth-child(1){--r:-2.4deg;margin-right:14%}
+.waits .brick:nth-child(2){--r:1.9deg;--dx:24px;margin-left:16%}
+.waits .brick:nth-child(3){--r:-1.1deg;--dx:-18px;margin-left:5%;margin-right:4%}
+.wait{display:flex;align-items:center;gap:16px}
+.wait p{color:var(--ice);font-size:1rem;font-weight:500;margin:0;line-height:1.35}
+.ico{flex:none;width:52px;height:36px;color:var(--ice);fill:none;stroke:currentColor;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round}
+.clock{flex:none;width:18px;height:18px;margin-left:auto;color:var(--container);fill:none;stroke:currentColor;stroke-width:1.25;stroke-linecap:round}
+.client{margin-top:clamp(20px,3.5vh,34px);padding-top:18px;border-top:1px solid var(--line);max-width:44ch}
+.client h3{font-size:.95rem;font-weight:600;color:var(--addon-lit);margin-bottom:6px}
+.client p{color:var(--ice)}
+
+/* ---------- 2 Evidencia ---------- */
+.wall{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.75fr) minmax(0,1fr);gap:clamp(16px,2vw,32px);align-items:start}
+.group h3{font-size:.98rem;font-weight:600;color:var(--mist);margin-bottom:6px}
+.stackv{display:grid;gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.source{font-size:.8rem;color:var(--mist)}
+
+/* ---------- 3 Solución ---------- */
+.contrast{display:flex;align-items:center;gap:16px;color:var(--mist);font-size:clamp(1rem,.85rem + .5vw,1.18rem);max-width:72ch;padding-bottom:clamp(14px,2.5vh,22px);border-bottom:1px solid var(--line)}
+.ring{flex:none;width:62px;height:62px;border-radius:50%;border:1px solid var(--container-line);display:grid;place-items:center;color:var(--container);font-weight:700;font-stretch:120%;font-size:1.02rem}
+.solution{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center}
+.metric{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 18px;margin-top:clamp(16px,3vh,26px)}
+.big{font-size:clamp(2.4rem,1.4rem + 3vw,4.1rem);font-weight:700;font-stretch:125%;line-height:1;color:var(--addon-lit);letter-spacing:-.015em;white-space:nowrap}
+.metric p{max-width:30ch;color:var(--ice);font-size:.98rem}
+.quote{margin-top:clamp(16px,3vh,26px);padding-left:18px;border-left:1px solid var(--addon);font-size:clamp(1.05rem,.9rem + .5vw,1.28rem);color:var(--text);max-width:38ch;line-height:1.4;font-weight:500}
+.status{display:inline-flex;align-items:center;gap:12px;margin-top:clamp(16px,3vh,24px);padding:10px 16px 10px 14px;border:1px solid var(--line);border-radius:999px;color:var(--ice);font-size:.92rem;max-width:100%}
+.pulse{position:relative;width:9px;height:9px;border-radius:50%;background:var(--addon-lit);flex:none}
+.pulse::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1px solid var(--addon-lit);animation:pulse 2.4s ease-out infinite}
+@keyframes pulse{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.8);opacity:0}}
+.build{display:flex;flex-direction:column-reverse;gap:18px}
+.row{display:grid;gap:12px}
+.row4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.row3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.row4 .brick{text-align:center;padding-block:12px}
+.row-cap{font-size:.85rem;color:var(--mist);margin-top:10px}
+.core{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:clamp(16px,2vw,24px)}
+.dal-s{font-size:clamp(1.8rem,1.2rem + 1.6vw,2.6rem);font-weight:800;font-stretch:125%;line-height:1;color:var(--text)}
+.core-t{color:var(--ice);font-size:.95rem;text-align:right;max-width:20ch}
+
+/* ---------- 4 Monetización ---------- */
+.money{grid-template-columns:minmax(0,.95fr) minmax(0,1.35fr) minmax(0,.9fr);align-items:start}
+.layer-h{font-size:.9rem;color:var(--mist)}
+.layer-t{font-size:clamp(1.12rem,.95rem + .55vw,1.4rem);font-weight:600;font-stretch:108%;line-height:1.2;margin:2px 0 12px}
+.money .small{margin-bottom:8px}
+.money .fig{margin-top:14px}
+.sep{height:1px;background:var(--line);margin:16px 0 2px}
+.market{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(16px,2.5vw,36px);align-items:center;padding-top:clamp(16px,2.5vh,24px);border-top:1px solid var(--line)}
+.minis{display:flex;flex-wrap:wrap;gap:10px 8px;max-width:300px}
+.mini{width:52px;height:20px;padding:0;margin-top:6px;border-radius:6px}
+.mini::before{left:5px;right:5px;background-size:20px 12px}
+.market p{color:var(--ice);max-width:60ch}
+.market b{color:var(--text);font-weight:600}
+
+/* ---------- 5 YSA ---------- */
+.ysa{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:center}
+.shift{display:grid;grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);gap:14px;margin-top:clamp(18px,3vh,30px);max-width:620px}
+.pile,.stackd{position:relative;height:140px}
+.pile .brick{position:absolute;width:74px;height:26px;padding:0;border-radius:6px;margin:0}
+.pile .brick::before,.stackd .brick::before{left:7px;right:7px}
+.pile .brick:nth-child(1){left:2%;top:100px;--r:-12deg}
+.pile .brick:nth-child(2){left:44%;top:104px;--r:9deg}
+.pile .brick:nth-child(3){left:18%;top:52px;--r:24deg}
+.pile .brick:nth-child(4){left:60%;top:60px;--r:-19deg}
+.stackd{display:flex;flex-direction:column-reverse;gap:4px}
+.stackd .brick{height:26px;padding:0;border-radius:6px}
+.stackd .brick:nth-child(odd){margin-right:22%}
+.stackd .brick:nth-child(even){margin-left:22%}
+.arrow{align-self:center;height:1px;background:var(--mist);position:relative;margin-top:-40px}
+.arrow::after{content:"";position:absolute;right:0;top:-4px;width:8px;height:8px;border-top:1px solid var(--mist);border-right:1px solid var(--mist);transform:rotate(45deg)}
+.shift-cap{margin-top:14px;font-size:.95rem;color:var(--ice);font-weight:500;line-height:1.35}
+.shift-cap span{display:block;font-size:.85rem;color:var(--mist);font-weight:400;margin-bottom:2px}
+.wins{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:clamp(20px,3.5vh,32px);max-width:620px}
+.win{display:flex;gap:12px;align-items:flex-start}
+.win p{color:var(--ice);margin:0;font-size:.95rem}
+.chk{flex:none;width:22px;height:22px;color:var(--addon-lit);fill:none;stroke:currentColor;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round}
+.closing{font-size:clamp(1.3rem,1rem + 1.25vw,2.05rem);line-height:1.3;font-weight:500;color:var(--text);max-width:26ch;text-wrap:balance}
+.thanks{margin-top:clamp(20px,4vh,40px);font-size:clamp(2.6rem,1.2rem + 4.2vw,5rem);font-weight:800;font-stretch:125%;line-height:.95;color:var(--text)}
+
+/* ---------- Barra de control ---------- */
+.bar{position:relative;z-index:3;display:flex;align-items:center;gap:16px;height:var(--bar-h);padding:0 clamp(16px,3vw,40px);border-top:1px solid var(--line);background:rgba(7,19,31,.88);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.wordmark{font-weight:700;font-stretch:115%;letter-spacing:-.01em;font-size:1rem;color:var(--ice)}
+.dots{display:flex;gap:2px;margin:0 auto}
+.dot{width:26px;height:26px;display:grid;place-items:center;background:none;border:0;padding:0;cursor:pointer;border-radius:50%}
+.dot::before{content:"";width:10px;height:10px;border-radius:50%;border:1px solid var(--mist);transition:background-color .25s,border-color .25s}
+.dot:hover::before{border-color:var(--ice)}
+.dot[aria-current="step"]::before{background:var(--addon-lit);border-color:var(--addon-lit)}
+.tools{display:flex;align-items:center;gap:10px}
+.timer{font-variant-numeric:tabular-nums;font-stretch:108%;font-size:.95rem;color:var(--ice);min-width:86px;text-align:right;transition:color .3s}
+.timer .of{color:var(--mist)}
+.timer.late{color:var(--container)}
+.btn{color:var(--ice);background:transparent;border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:.9rem;cursor:pointer;transition:border-color .2s,background-color .2s}
+.btn:hover{border-color:var(--addon-lit)}
+.btn[aria-pressed="true"]{border-color:var(--addon-lit);color:var(--text);background:rgba(46,117,182,.14)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn--primary{border-color:var(--addon);background:var(--addon-deep);color:var(--text)}
+.btn--primary:hover{background:#245a8b}
+:focus-visible{outline:1.5px solid var(--addon-lit);outline-offset:3px}
+
+/* ---------- Guion (notas del presentador) ---------- */
+.notes{position:fixed;z-index:4;right:clamp(12px,3vw,40px);bottom:calc(var(--bar-h) + 14px + env(safe-area-inset-bottom,0px));width:min(560px,calc(100vw - 24px));max-height:min(52vh,460px);overflow:auto;background:var(--deck);border:1px solid var(--brick-line);border-radius:16px;padding:18px 20px}
+.notes[hidden]{display:none}
+.notes-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:10px}
+.notes-head b{font-weight:600}
+.notes-head span{color:var(--mist);font-size:.85rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.notes-text{color:var(--ice);line-height:1.55;font-size:.98rem}
+.notes-keys{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);color:var(--mist);font-size:.8rem}
+
+/* ---------- Responsive ---------- */
+@media (max-width:980px){
+  .cover,.split,.solution,.money,.ysa,.wall{grid-template-columns:minmax(0,1fr)}
+  .inner{align-content:start}
+  .tower{justify-self:start}
+}
+@media (max-width:620px){
+  .grid2,.row3,.wins{grid-template-columns:minmax(0,1fr)}
+  .row4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .market{grid-template-columns:minmax(0,1fr)}
+  .wordmark,.dots,.timer .of{display:none}
+  .timer{min-width:0}
+  .btn{padding:8px 12px}
+  .core{flex-direction:column;align-items:flex-start}
+  .core-t{text-align:left}
+}
+@supports (-webkit-text-stroke:1px black){.thanks{color:transparent;-webkit-text-stroke:1.2px var(--ice)}}
+@media (prefers-reduced-motion:reduce){
+  .scene,.scene.is-active{transition:none}
+  .is-built .brick{animation:none;opacity:1;transform:rotate(var(--r,0deg))}
+  .is-built .fade{animation:none;opacity:1}
+  .pulse::after{animation:none;opacity:0}
+}
+</style>
+</head>
+<body>
+
+<main class="deck" id="deck">
+
+  <!-- 0 Portada -->
+  <section class="scene" aria-label="Portada">
+    <div class="inner cover">
+      <div>
+        <p class="kicker fade" style="--d:0">Pitch YSA 2026</p>
+        <h1 class="dal fade" style="--d:120">DAL</h1>
+        <p class="lead fade" style="--d:300">Plataforma de Desarrollo de Agentes para el clúster logístico del Caribe colombiano.</p>
+        <p class="cover-meta fade" style="--d:520">Addon.ai</p>
+        <p class="hint fade" style="--d:1100">Avanza con las flechas del teclado, la barra espaciadora o el botón Siguiente.</p>
+      </div>
+      <div class="tower" aria-label="Estructura del pitch">
+        <div class="brick" style="--i:0"><span class="tn">1</span>Cliente y problema</div>
+        <div class="brick" style="--i:1"><span class="tn">2</span>Evidencia</div>
+        <div class="brick" style="--i:2"><span class="tn">3</span>Solución</div>
+        <div class="brick" style="--i:3"><span class="tn">4</span>Monetización</div>
+        <div class="brick" style="--i:4"><span class="tn">5</span>Aporte de YSA</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 Cliente y problema -->
+  <section class="scene" aria-label="Cliente y problema">
+    <div class="inner split">
+      <div>
+        <p class="step fade" style="--d:0"><span class="step-n">1</span>Cliente y problema</p>
+        <p class="kicker fade" style="--d:80">Puerto de Cartagena, 6:00 a. m.</p>
+        <h2 class="h2 fade" style="--d:160">El problema no es la falta de datos.</h2>
+        <p class="lead fade" style="--d:300">Es que la información llega tarde, desincronizada y pensada solo para operar, no para decidir.</p>
+        <div class="client fade" style="--d:480">
+          <h3>Nuestros clientes</h3>
+          <p>Agencias de aduanas y empresas de transporte: los operadores del clúster logístico del Caribe colombiano.</p>
+        </div>
+      </div>
+      <div class="waits">
+        <div class="brick" style="--i:2">
+          <div class="wait">
+            <svg class="ico" viewBox="0 0 52 36" aria-hidden="true"><rect x="3" y="6" width="46" height="24" rx="2"/><path d="M11 10v16M17 10v16M23 10v16M29 10v16M35 10v16M41 10v16"/></svg>
+            <p>Un contenedor espera su liberación</p>
+            <svg class="clock" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><path d="M9 5v4l2.6 1.6"/></svg>
+          </div>
+        </div>
+        <div class="brick" style="--i:3">
+          <div class="wait">
+            <svg class="ico" viewBox="0 0 52 36" aria-hidden="true"><rect x="3" y="8" width="29" height="18" rx="2"/><path d="M32 13h8l7 7v6H32z"/><circle cx="12" cy="28" r="3.5"/><circle cx="39" cy="28" r="3.5"/></svg>
+            <p>Un camión espera turno</p>
+            <svg class="clock" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><path d="M9 5v4l2.6 1.6"/></svg>
+          </div>
+        </div>
+        <div class="brick" style="--i:4">
+          <div class="wait">
+            <svg class="ico" viewBox="0 0 52 36" aria-hidden="true"><path d="M16 3h15l8 8v22H16z"/><path d="M31 3v8h8M20 17h15M20 22h15M20 27h10"/></svg>
+            <p>La agencia de aduanas espera un documento que nadie ha enviado</p>
+            <svg class="clock" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><path d="M9 5v4l2.6 1.6"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 Evidencia -->
+  <section class="scene" aria-label="Evidencia del problema">
+    <div class="inner">
+      <div>
+        <p class="step fade" style="--d:0"><span class="step-n">2</span>Evidencia</p>
+        <h2 class="h2 fade" style="--d:120">Ese desfase tiene un costo medible.</h2>
+      </div>
+      <div class="wall">
+        <div class="group">
+          <h3 class="fade" style="--d:200">Costo operativo</h3>
+          <div class="stackv">
+            <div class="brick brick--warm" style="--i:0"><span class="fig">15–25%</span><p>de sobrecosto por unidad movilizada al operar con datos desactualizados.</p></div>
+            <div class="brick brick--warm" style="--i:1"><span class="fig">$8<small>millones</small></span><p>de pesos al mes en digitación manual.</p></div>
+          </div>
+        </div>
+        <div class="group">
+          <h3 class="fade" style="--d:300">Riesgo sancionatorio</h3>
+          <div class="grid2">
+            <div class="brick brick--warm" style="--i:2"><span class="fig">2.716</span><p>investigaciones de la Superintendencia de Transporte entre enero y septiembre de 2025.</p></div>
+            <div class="brick brick--warm" style="--i:3"><span class="fig">$6.061<small>millones</small></span><p>de pesos en multas impuestas en ese mismo periodo.</p></div>
+            <div class="brick brick--warm" style="--i:4"><span class="fig">258</span><p>investigaciones a empresas de carga por incumplimientos del SICE-TAC.</p></div>
+            <div class="brick brick--warm" style="--i:5"><span class="fig">100–1.000<small>UVT</small></span><p>en sanciones de la DIAN por inconsistencias en manifiestos, con riesgo de inmovilizar la carga.</p></div>
+          </div>
+        </div>
+        <div class="group">
+          <h3 class="fade" style="--d:400">Frente al cliente final</h3>
+          <div class="stackv">
+            <div class="brick brick--warm" style="--i:6"><span class="fig fig--long"><small class="pre">USD</small>5.000–50.000</span><p>en penalidades por cada retraso imprevisto.</p></div>
+          </div>
+        </div>
+      </div>
+      <p class="source fade" style="--d:1000">Cifras regulatorias: Superintendencia de Transporte (2024 y 2025) y DIAN.</p>
+    </div>
+  </section>
+
+  <!-- 3 Solución -->
+  <section class="scene" aria-label="Solución e innovación">
+    <div class="inner">
+      <p class="contrast fade" style="--d:0"><span class="ring">71%</span>La tecnología tradicional no ha resuelto esto: el 71% de los proyectos de IA del sector fracasa por falta de ejecución confiable.</p>
+      <div class="solution" style="display:grid;gap:clamp(24px,4vw,64px)">
+        <div>
+          <p class="step fade" style="--d:120"><span class="step-n">3</span>Solución</p>
+          <h2 class="h2 fade" style="--d:200">Por eso creamos DAL.</h2>
+          <p class="lead fade" style="--d:320">Nuestra Plataforma de Desarrollo de Agentes se conecta a los sistemas que el cliente ya tiene, sin reemplazarlos, y despliega agentes de IA que trabajan dentro de la operación.</p>
+          <div class="metric fade" style="--d:1300">
+            <span class="big">&lt; 15 min</span>
+            <p>La información deja de llegar con días de atraso y se actualiza en menos de 15 minutos.</p>
+          </div>
+          <p class="quote fade" style="--d:1500">No entregamos tableros que muestran lo que ya pasó: entregamos agentes que actúan mientras pasa.</p>
+          <p class="status fade" style="--d:1700"><span class="pulse" aria-hidden="true"></span>Hoy validamos DAL con Serpomar, en Cartagena, como paso previo a la salida al mercado.</p>
+        </div>
+        <div class="build">
+          <div>
+            <div class="row row4">
+              <div class="brick" style="--i:0"><b>ERP</b></div>
+              <div class="brick" style="--i:1"><b>GPS</b></div>
+              <div class="brick" style="--i:2"><b>Básculas</b></div>
+              <div class="brick" style="--i:3"><b>Documentos</b></div>
+            </div>
+            <p class="row-cap fade" style="--d:600">Tus sistemas, sin reemplazarlos</p>
+          </div>
+          <div class="brick brick--solid core" style="--i:5"><span class="dal-s">DAL</span><span class="core-t">Plataforma de Desarrollo de Agentes</span></div>
+          <div class="row row3">
+            <div class="brick" style="--i:7"><b>Agente de manifiestos</b><p>Valida cada manifiesto antes de que la carga se mueva.</p></div>
+            <div class="brick" style="--i:8"><b>Agente de anticipación</b><p>Anticipa retrasos con 4 a 12 horas de ventaja.</p></div>
+            <div class="brick" style="--i:9"><b>Agente de cumplimiento</b><p>Vigila el cumplimiento regulatorio.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 Monetización -->
+  <section class="scene" aria-label="Monetización y escalabilidad">
+    <div class="inner">
+      <div>
+        <p class="step fade" style="--d:0"><span class="step-n">4</span>Monetización y escalabilidad</p>
+        <h2 class="h2 fade" style="--d:120">Monetizamos con un modelo híbrido de dos capas.</h2>
+      </div>
+      <div class="money" style="display:grid;gap:clamp(18px,2.4vw,36px)">
+        <div>
+          <p class="layer-h fade" style="--d:200">Capa 1</p>
+          <p class="layer-t fade" style="--d:200">Discovery y diseño</p>
+          <div class="brick" style="--i:0">
+            <b>Blueprint Engine</b>
+            <p>Levantamos y diseñamos el proceso agéntico de cada cliente, y lo cobramos por horas de ingeniería.</p>
+            <span class="fig fig--blue fig--long"><small class="pre">USD</small>8.000–15.000</span>
+          </div>
+        </div>
+        <div>
+          <p class="layer-h fade" style="--d:320">Capa 2</p>
+          <p class="layer-t fade" style="--d:320">Suscripción a la aplicación núcleo</p>
+          <p class="small fade" style="--d:380">Un SaaS que cobra por uso:</p>
+          <div class="grid2">
+            <div class="brick" style="--i:2"><b>Ejecuciones de agentes en producción</b></div>
+            <div class="brick" style="--i:3"><b>Bases de conocimiento RAG</b></div>
+            <div class="brick" style="--i:4"><b>Tokens de entrada y salida por modelo</b></div>
+            <div class="brick" style="--i:5"><b>Procesamiento de documentos</b></div>
+          </div>
+        </div>
+        <div>
+          <p class="layer-h fade" style="--d:440">Proyección</p>
+          <p class="layer-t fade" style="--d:440">Ingresos recurrentes</p>
+          <div class="brick brick--dash" style="--i:7">
+            <span class="fig fig--blue fig--long" style="margin-top:0"><small class="pre">USD</small>5.000–50.000</span>
+            <p>al mes por cuenta industrial.</p>
+            <div class="sep"></div>
+            <span class="fig fig--blue">&gt; 70%</span>
+            <p>de margen operativo.</p>
+          </div>
+        </div>
+      </div>
+      <div class="market fade" style="--d:900">
+        <div class="minis" aria-hidden="true">
+          <div class="brick mini" style="--i:9"></div>
+          <div class="brick mini" style="--i:10"></div>
+          <div class="brick mini" style="--i:11"></div>
+          <div class="brick mini" style="--i:12"></div>
+          <div class="brick mini" style="--i:13"></div>
+          <div class="brick mini" style="--i:14"></div>
+          <div class="brick mini" style="--i:15"></div>
+          <div class="brick mini" style="--i:16"></div>
+        </div>
+        <p><b>Marketplace de microservicios reutilizables.</b> Cada agente que construimos se suma al marketplace y hace cada nueva implementación más rápida y más rentable.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 Aporte YSA y cierre -->
+  <section class="scene" aria-label="Aporte de YSA y cierre">
+    <div class="inner ysa">
+      <div>
+        <p class="step fade" style="--d:0"><span class="step-n">5</span>Aporte de YSA</p>
+        <h2 class="h2 fade" style="--d:120">El programa YSA fue determinante.</h2>
+        <div class="shift">
+          <div>
+            <div class="pile" aria-hidden="true">
+              <div class="brick" style="--i:0"></div>
+              <div class="brick" style="--i:1"></div>
+              <div class="brick" style="--i:2"></div>
+              <div class="brick" style="--i:3"></div>
+            </div>
+            <p class="shift-cap fade" style="--d:500"><span>Antes</span>Consultora técnica tradicional</p>
+          </div>
+          <div class="arrow fade" style="--d:600" aria-hidden="true"></div>
+          <div>
+            <div class="stackd" aria-hidden="true">
+              <div class="brick brick--solid" style="--i:5"></div>
+              <div class="brick brick--solid" style="--i:6"></div>
+              <div class="brick brick--solid" style="--i:7"></div>
+              <div class="brick brick--solid" style="--i:8"></div>
+            </div>
+            <p class="shift-cap fade" style="--d:1100"><span>Hoy</span>Modelo SaaS escalable por uso de agentes</p>
+          </div>
+        </div>
+        <div class="wins">
+          <div class="brick win" style="--i:10">
+            <svg class="chk" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="10"/><path d="M6.5 11.5l3 3 6-6.5"/></svg>
+            <p>Garantía de resultados con devolución del 20% de la inversión.</p>
+          </div>
+          <div class="brick win" style="--i:11">
+            <svg class="chk" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="10"/><path d="M6.5 11.5l3 3 6-6.5"/></svg>
+            <p>Modelo financiero para el ecosistema portuario del Caribe.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="closing fade" style="--d:1500">Con la Cámara de Comercio de Santa Marta e ITC como aliados, DAL será el motor que transforme la logística de nuestra región.</p>
+        <p class="thanks fade" style="--d:1900">Muchas gracias.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<aside class="notes" id="notes" hidden aria-label="Guion del bloque actual">
+  <div class="notes-head"><b id="notesTitle"></b><span id="notesTarget"></span></div>
+  <p class="notes-text" id="notesText"></p>
+  <p class="notes-keys">Flechas o barra espaciadora para avanzar. N muestra u oculta el guion, R reinicia el cronómetro y F activa la pantalla completa.</p>
+</aside>
+
+<footer class="bar">
+  <span class="wordmark">Addon.ai</span>
+  <nav class="dots" id="dots" aria-label="Bloques del pitch"></nav>
+  <div class="tools">
+    <span class="timer" id="timer" title="Cronómetro del pitch"><span id="timerVal">0:00</span><span class="of"> / 3:00</span></span>
+    <button class="btn" id="notesBtn" type="button" aria-pressed="false" aria-controls="notes">Guion</button>
+    <button class="btn" id="prev" type="button">Anterior</button>
+    <button class="btn btn--primary" id="next" type="button">Siguiente</button>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var scenes = Array.prototype.slice.call(document.querySelectorAll('.scene'));
+  var titles = ['Portada','Cliente y problema','Evidencia','Solución','Monetización','Aporte de YSA'];
+  var targets = [0,30,70,115,155,180];
+  var notes = [
+    'Portada. Cuando avances al primer bloque arranca el cronómetro de 3 minutos.',
+    'Son las seis de la mañana en el puerto de Cartagena. Un contenedor espera su liberación, un camión espera turno y la agencia de aduanas espera un documento que nadie ha enviado. Nuestros clientes son las agencias de aduanas y las empresas de transporte: los operadores del clúster logístico del Caribe colombiano. Su problema no es la falta de datos. Es que la información llega tarde, desincronizada y pensada solo para operar, no para decidir.',
+    'Ese desfase tiene un costo medible. Operar con datos desactualizados genera sobrecostos del 15% al 25% por unidad movilizada y hasta 8 millones de pesos al mes en digitación manual. El riesgo sancionatorio es igual de alto: entre enero y septiembre de 2025, la Superintendencia de Transporte adelantó 2.716 investigaciones e impuso multas por más de 6.061 millones de pesos, y ya había abierto 258 investigaciones a empresas de carga por incumplimientos del SICE-TAC. A esto se suman las sanciones de la DIAN por inconsistencias en manifiestos, de 100 a 1.000 UVT, que pueden terminar en la inmovilización de la carga. Y frente al cliente final, un retraso imprevisto cuesta entre 5.000 y 50.000 dólares en penalidades por evento.',
+    'La tecnología tradicional no ha resuelto esto: el 71% de los proyectos de IA del sector fracasa por falta de ejecución confiable. Por eso creamos DAL, nuestra Plataforma de Desarrollo de Agentes. DAL se conecta a los sistemas que el cliente ya tiene (ERP, GPS, básculas y documentos) sin reemplazarlos, y despliega agentes de inteligencia artificial que trabajan dentro de la operación: uno valida cada manifiesto antes de que la carga se mueva, otro anticipa retrasos con 4 a 12 horas de ventaja y otro vigila el cumplimiento regulatorio. La información deja de llegar con días de atraso y se actualiza en menos de 15 minutos. No entregamos tableros que muestran lo que ya pasó: entregamos agentes que actúan mientras pasa. Hoy estamos validando DAL con Serpomar, en Cartagena, como paso previo a nuestra salida al mercado.',
+    'Monetizamos con un modelo híbrido de dos capas. La primera es el Discovery: con nuestro Blueprint Engine levantamos y diseñamos el proceso agéntico de cada cliente, y lo cobramos por horas de ingeniería, entre 3.000 y 15.000 dólares. La segunda es la suscripción a nuestra aplicación núcleo, un SaaS que cobra por uso: ejecuciones de agentes en producción, bases de conocimiento RAG, consumo de tokens de entrada y salida por modelo, y procesamiento de documentos. Cada agente que construimos se suma a nuestro marketplace de microservicios reutilizables, y eso hace cada nueva implementación más rápida y más rentable. Proyectamos ingresos recurrentes de 5.000 a 50.000 dólares mensuales por cuenta industrial, con márgenes operativos superiores al 70%.',
+    'El programa YSA fue determinante. Nos llevó de ser una consultora técnica tradicional a un modelo SaaS escalable por uso de agentes, nos ayudó a estructurar una garantía de resultados con devolución del 20% de la inversión y a construir nuestro modelo financiero para el ecosistema portuario del Caribe. Con la Cámara de Comercio de Santa Marta e ITC como aliados, DAL será el motor que transforme la logística de nuestra región. Muchas gracias.'
+  ];
+
+  var dotsEl = document.getElementById('dots');
+  var prevBtn = document.getElementById('prev');
+  var nextBtn = document.getElementById('next');
+  var notesBtn = document.getElementById('notesBtn');
+  var notesEl = document.getElementById('notes');
+  var notesTitle = document.getElementById('notesTitle');
+  var notesTarget = document.getElementById('notesTarget');
+  var notesText = document.getElementById('notesText');
+  var timerWrap = document.getElementById('timer');
+  var timerVal = document.getElementById('timerVal');
+  var cur = -1, t0 = null, tick = null;
+
+  function fmt(s){ return Math.floor(s/60) + ':' + String(s % 60).padStart(2,'0'); }
+
+  titles.forEach(function(t, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'dot';
+    b.setAttribute('aria-label', i ? (i + '. ' + t) : t);
+    b.addEventListener('click', function(){ go(i); });
+    dotsEl.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsEl.children);
+
+  function render(){
+    var s = t0 === null ? 0 : Math.floor((performance.now() - t0) / 1000);
+    timerVal.textContent = fmt(s);
+    timerWrap.classList.toggle('late', t0 !== null && cur > 0 && s > targets[cur]);
+  }
+  function startTimer(){
+    t0 = performance.now();
+    clearInterval(tick);
+    tick = setInterval(render, 250);
+    render();
+  }
+  function resetTimer(){
+    clearInterval(tick);
+    t0 = null;
+    if (cur > 0) startTimer(); else render();
+  }
+
+  function updateNotes(){
+    notesTitle.textContent = cur ? (cur + '. ' + titles[cur]) : titles[0];
+    notesTarget.textContent = cur ? ('Terminar en ' + fmt(targets[cur])) : 'Duración total 3:00';
+    notesText.textContent = notes[cur];
+  }
+
+  function go(i){
+    i = Math.max(0, Math.min(scenes.length - 1, i));
+    if (i === cur) return;
+    scenes.forEach(function(s, k){
+      var on = k === i;
+      s.classList.toggle('is-active', on);
+      s.inert = !on;
+      s.setAttribute('aria-hidden', on ? 'false' : 'true');
+      if (!on) s.classList.remove('is-built');
+    });
+    var s = scenes[i];
+    s.scrollTop = 0;
+    void s.offsetWidth;
+    s.classList.add('is-built');
+    cur = i;
+    dots.forEach(function(d, k){ d.setAttribute('aria-current', k === i ? 'step' : 'false'); });
+    prevBtn.disabled = i === 0;
+    nextBtn.textContent = i === scenes.length - 1 ? 'Volver al inicio' : 'Siguiente';
+    if (i > 0 && t0 === null) startTimer();
+    updateNotes();
+    render();
+    try { history.replaceState(null, '', '#' + i); } catch (e) {}
+  }
+
+  function toggleNotes(){
+    notesEl.hidden = !notesEl.hidden;
+    notesBtn.setAttribute('aria-pressed', String(!notesEl.hidden));
+  }
+  function toggleFs(){
+    try {
+      if (document.fullscreenElement) { document.exitFullscreen(); return; }
+      var el = document.documentElement;
+      if (el.requestFullscreen) {
+        var p = el.requestFullscreen();
+        if (p && p.catch) p.catch(function(){});
+      }
+    } catch (e) {}
+  }
+
+  prevBtn.addEventListener('click', function(){ go(cur - 1); });
+  nextBtn.addEventListener('click', function(){ go(cur === scenes.length - 1 ? 0 : cur + 1); });
+  notesBtn.addEventListener('click', toggleNotes);
+
+  document.addEventListener('keydown', function(e){
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var k = e.key;
+    var onBtn = e.target && e.target.tagName === 'BUTTON';
+    if (k === 'ArrowRight' || k === 'PageDown' || ((k === ' ' || k === 'Enter') && !onBtn)) { e.preventDefault(); go(cur + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(cur - 1); }
+    else if (k === 'Home') { e.preventDefault(); go(0); }
+    else if (k === 'End') { e.preventDefault(); go(scenes.length - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'r' || k === 'R') { resetTimer(); }
+    else if (k === 'f' || k === 'F') { toggleFs(); }
+  });
+
+  var sx = null, sy = null;
+  document.addEventListener('touchstart', function(e){
+    var t = e.changedTouches[0]; sx = t.clientX; sy = t.clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e){
+    if (sx === null) return;
+    var t = e.changedTouches[0];
+    var dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4) go(cur + (dx < 0 ? 1 : -1));
+    sx = null;
+  }, { passive: true });
+
+  function fromHash(){ var h = parseInt((location.hash || '').slice(1), 10); go(isNaN(h) ? 0 : h); }
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>
